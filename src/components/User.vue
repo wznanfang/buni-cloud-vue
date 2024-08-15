@@ -1,5 +1,9 @@
 <template>
   <CommonLayout>
+    <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+      <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+    </el-breadcrumb>
     <div class="flex gap-4 mb-4">
       <el-input
           v-model="usernameInput"
@@ -16,7 +20,7 @@
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
+      <el-button @click="addRow" class="addButton" type="primary" >新增</el-button>
       <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
     </div>
     <el-table
@@ -30,7 +34,7 @@
         :header-cell-style="{ 'text-align': 'center' }"
         @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55"/>
+      <el-table-column type="selection" width="45"/>
       <el-table-column prop="username" label="用户名" width="120"/>
       <el-table-column prop="name" label="姓名" width="150"/>
       <el-table-column prop="age" label="年龄" width="100"/>
@@ -43,7 +47,7 @@
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" type="primary">编辑</el-button>
-            <el-button @click="deleted(scope.row)" type="danger">删除</el-button>
+            <el-button @click="deleted(scope.row)" type="danger" >删除</el-button>
             <el-button v-if="scope.row.enable === '启用'" @click="toggleStatus(scope.row, false)" type="warning">禁用</el-button>
             <el-button v-else @click="toggleStatus(scope.row, true)" type="warning">启用</el-button>
           </div>
@@ -392,7 +396,7 @@ function search() {
     params: {
       username: usernameInput.value,
       name: nameInput.value,
-      page: currentPage.value,
+      current: currentPage.value,
       size: pageSize.value
     }
   }).then(response => {
@@ -454,6 +458,11 @@ function toggleStatus(row, enable) {
   margin: 20px 20px 20px 20px;
 }
 
+.breadcrumb{
+  margin: 20px;
+  font-size: 15px;
+}
+
 .usernameInput {
   height: 35px;
   width: 200px;
@@ -462,7 +471,7 @@ function toggleStatus(row, enable) {
 .nameInput {
   height: 35px;
   width: 200px;
-  margin-left: 30px;
+  margin-left: 20px;
 }
 
 .searchButton {
@@ -479,14 +488,14 @@ function toggleStatus(row, enable) {
 }
 
 .userTable {
-  margin: 20px;
+  width: 97%;
+  margin-left: 20px;
 }
 
 .button-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  width: 92%;
 }
 
 .pagination-container {
