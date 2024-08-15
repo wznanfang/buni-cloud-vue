@@ -70,7 +70,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 .aside {
   margin: 0 0 0 200px;
-  width: 300px;
+  width: 200px;
   background-color: rgb(245, 245, 245);
 }
 
