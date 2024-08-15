@@ -16,6 +16,7 @@
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <el-table
+        class="userTable"
         :data="records"
         border
         stripe
@@ -236,24 +237,30 @@ function toggleStatus(row, enable) {
 }
 
 .usernameInput {
-  height: 40px;
+  height: 35px;
   width: 200px;
 }
 
 .nameInput {
-  height: 40px;
+  height: 35px;
   width: 200px;
   margin-left: 30px;
 }
 
 .searchButton {
+  height:35px;
   margin-left: auto;
+}
+
+.userTable{
+  margin: 20px;
 }
 
 .button-container {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  width: 92%;
 }
 
 .pagination-container {
