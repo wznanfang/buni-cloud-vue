@@ -84,26 +84,29 @@ body, html {
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(255, 255, 255, 0.7);
-  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  width: 400px;
+  height: 300px;
 }
 
 .login-title {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 
 .login-input {
   width: 100%;
   height: 40px;
+  margin-right: 50px;
 }
 
 .login-button {
   width: 100%;
   height: 40px;
+  margin-top: 20px;
+  margin-right: 50px;
 }
 
 </style>
