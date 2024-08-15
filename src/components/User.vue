@@ -14,7 +14,10 @@
           placeholder="姓名"
       />
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
+    </div>
+    <div class="flex justify-end mb-4">
       <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
+      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
     </div>
     <el-table
         class="userTable"
@@ -41,14 +44,13 @@
           <div class="button-container">
             <el-button @click="editRow(scope.row)" type="primary">编辑</el-button>
             <el-button @click="deleted(scope.row)" type="danger">删除</el-button>
-            <el-button v-if="scope.row.enable" @click="toggleStatus(scope.row, false);" type="warning">禁用</el-button>
-            <el-button v-else @click="toggleStatus(scope.row, true);" type="warning">启用</el-button>
+            <el-button v-if="scope.row.enable === '启用'" @click="toggleStatus(scope.row, false)" type="warning">禁用</el-button>
+            <el-button v-else @click="toggleStatus(scope.row, true)" type="warning">启用</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
     <div class="pagination-container">
-      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -188,7 +190,7 @@
 //引入
 import CommonLayout from "@/components/CommonLayout.vue";
 import {API_BASE_URL} from '../config.js';
-import {onMounted, ref, reactive} from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
 
@@ -217,6 +219,7 @@ onMounted(() => {
 const showAddDialog = ref(false);
 const addForm = reactive({
   username: '',
+  password: '',
   name: '',
   age: '',
   sex: '男',
@@ -226,6 +229,13 @@ const addForm = reactive({
 
 // 显示新增对话框
 function addRow() {
+  addForm.username = '';
+  addForm.password = '';
+  addForm.name = '';
+  addForm.age = '';
+  addForm.sex = '男';
+  addForm.tel = '';
+  addForm.enable = '禁用';
   showAddDialog.value = true;
 }
 
@@ -234,7 +244,7 @@ async function addUser() {
     addForm.sex = addForm.sex === '男' ? 1 : 0;
     addForm.enable = addForm.enable === '启用' ? 1 : 0;
     await save(addForm);
-    dialogVisible.value = false;
+    showAddDialog.value = false;
     search();
   } catch (error) {
     console.error(error);
@@ -267,6 +277,7 @@ const editForm = reactive({
   enable: '',
   admin: ''
 });
+
 // 显示编辑对话框
 async function editRow(row) {
   try {
@@ -284,6 +295,7 @@ async function editRow(row) {
     ElMessage.error('查询失败，请稍后再试');
   }
 }
+
 // 保存更改
 async function saveChanges() {
   try {
@@ -297,6 +309,7 @@ async function saveChanges() {
     console.error(error);
   }
 }
+
 function update(user) {
   return axios.put(`${API_BASE_URL}/user/v1/user`, user, {
     headers: {
@@ -331,13 +344,11 @@ function deleted(row) {
 
 //批量删除
 function batchDelete() {
-  console.log('token:', token);
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择数据');
     return;
   }
   const ids = selectedRows.value.map(row => row.id);
-  console.log('批量删除的ID:', ids);
   axios.delete(`${API_BASE_URL}/user/v1/user/batchDelete`, {
     headers: {
       'Content-Type': 'application/json',
@@ -364,7 +375,6 @@ function findById(id) {
       'Authorization': token
     }
   }).then(response => {
-    console.log('根据id查询请求成功:', response);
     if (response.data.code === 200) {
       return response;
     } else {
@@ -387,7 +397,6 @@ function search() {
     }
   }).then(response => {
     const result = response.data;
-    console.log('请求成功:', result);
     if (result.code === 200) {
       records.value = result.result.records;
       totalRecords.value = result.result.total;
@@ -419,7 +428,6 @@ function toggleStatus(row, enable) {
     id: row.id,
     enable: enable ? 1 : 0
   };
-
   axios.put(`${API_BASE_URL}/user/v1/user/forbidden`, data, {
     headers: {
       'Content-Type': 'application/json',
@@ -427,7 +435,6 @@ function toggleStatus(row, enable) {
     }
   }).then(response => {
     const result = response.data;
-    console.log('请求成功:', result);
     if (result.code === 200) {
       ElMessage.success('操作成功');
       search();
@@ -460,9 +467,14 @@ function toggleStatus(row, enable) {
 
 .searchButton {
   height: 35px;
+  margin-left: 30px;
 }
 
 .addButton {
+  height: 35px;
+}
+
+.batchDeleteButton {
   height: 35px;
 }
 
@@ -479,7 +491,7 @@ function toggleStatus(row, enable) {
 
 .pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin: 20px 20px;
 }
