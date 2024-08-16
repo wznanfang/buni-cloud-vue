@@ -35,10 +35,10 @@
         :header-cell-style="{ 'text-align': 'center' }"
         @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="45"/>
+      <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="username" label="用户名" width="120"/>
       <el-table-column prop="name" label="姓名" width="150"/>
-      <el-table-column prop="age" label="年龄" width="100"/>
+      <el-table-column prop="age" label="年龄" width="90"/>
       <el-table-column prop="sex" label="性别" width="100"/>
       <el-table-column prop="tel" label="电话" width="150"/>
       <el-table-column prop="enable" label="状态" width="100"/>
@@ -454,13 +454,13 @@ function toggleStatus(row, enable) {
 <style scoped>
 
 .breadcrumb{
-  margin: 20px;
+  margin: 30px 0 20px 20px;
   font-size: 15px;
 }
 
 .flex {
   display: flex;
-  margin: 20px 0 20px 20px;
+  margin: 30px 0 20px 20px;
   align-items: center;
 }
 
@@ -485,7 +485,7 @@ function toggleStatus(row, enable) {
 }
 
 .userTable {
-  width: 100%;
+  width: 98%;
   margin-left: 20px;
 }
 
@@ -499,7 +499,7 @@ function toggleStatus(row, enable) {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin: 20px 20px;
+  margin-top: 30px;
 }
 
 </style>

@@ -146,8 +146,6 @@ const logout = async () => {
   padding: 0;
   margin: 0 200px 0 0;
   height: 100%;
-  width: 2000px;
-  overflow: hidden;
 }
 
 .content-container {
