@@ -3,11 +3,11 @@
     <el-container>
       <el-header class="header">
         <span class="logo">不逆云系统</span>
-        <el-dropdown><span class="el-dropdown-link">{{ username }}</span>
+        <el-dropdown><span class="el-dropdown-link">{{ userInfo.name }}</span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>个人中心</el-dropdown-item>
-              <el-dropdown-item>退出登录</el-dropdown-item>
+              <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -47,11 +47,15 @@
 
 <script lang="ts" setup>
 import {computed} from 'vue';
-import {useRoute} from 'vue-router';
-
-const username = JSON.parse(sessionStorage.getItem('userInfo')).name;
+import {useRoute, useRouter} from 'vue-router';
+import {ElMessage} from 'element-plus';
+import {API_BASE_URL} from '../config.js';
 
 const route = useRoute();
+const router = useRouter();
+const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+const tokenVO = JSON.parse(sessionStorage.getItem('authToken'));
+const token = 'bearer ' + tokenVO.token;
 
 // 计算需要展开的菜单项
 const defaultOpeneds = computed(() => {
@@ -69,6 +73,32 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath);
 };
+
+
+// 清理会话信息的函数
+const logout = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/v1/loginOut`, {
+      method: 'POST',
+      headers: {
+        'Authorization': token
+      }
+    });
+    const result = await response.json();
+    if (result.code === 200) {
+      sessionStorage.removeItem('userInfo');
+      sessionStorage.removeItem('authToken');
+      ElMessage.success('退出登录');
+      await router.push({name: 'Login'});
+    } else {
+      ElMessage.error('退出登录失败');
+    }
+  } catch (error) {
+    console.error('退出登录失败:', error);
+  }
+}
+
+
 </script>
 
 <style scoped>
