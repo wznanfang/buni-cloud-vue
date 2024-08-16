@@ -303,8 +303,11 @@ async function editRow(row) {
 
 // 保存更改
 async function saveChanges() {
+  console.log(editForm)
   try {
-    editForm.sex = editForm.sex === '1' ? 1 : 0;
+    editForm.sex = editForm.sex === '男' ? 1 : 0;
+    editForm.enable = editForm.enable === '启用' ? 1 : 0;
+    editForm.admin = editForm.admin === '是' ? 1 : 0;
     await update(editForm);
     dialogVisible.value = false;
     search();
