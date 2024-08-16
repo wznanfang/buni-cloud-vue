@@ -17,6 +17,7 @@
           class="nameInput"
           placeholder="姓名"
       />
+      <div class="flex-grow"></div>
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
@@ -43,7 +44,7 @@
       <el-table-column prop="enable" label="状态" width="100"/>
       <el-table-column prop="admin" label="管理员" width="100"/>
       <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column prop="createTime" label="操作" fixed="right">
+      <el-table-column prop="createTime" label="操作" fixed="right" width="250">
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" type="primary">编辑</el-button>
@@ -68,7 +69,7 @@
     </div>
 
     <!-- 新增对话框 -->
-    <el-dialog v-model="showAddDialog" title="新增用户" width="30%">
+    <el-dialog v-model="showAddDialog" title="新增用户" width="35%">
       <el-form :model="addForm" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
@@ -130,7 +131,7 @@
     </el-dialog>
 
     <!-- 编辑对话框 -->
-    <el-dialog v-model="dialogVisible" title="编辑信息" width="30%">
+    <el-dialog v-model="dialogVisible" title="编辑信息" width="35%">
       <el-form :model="editForm" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
@@ -226,9 +227,9 @@ const addForm = reactive({
   password: '',
   name: '',
   age: '',
-  sex: '男',
+  sex: '1',
   tel: '',
-  enable: '禁用',
+  enable: '0',
 });
 
 // 显示新增对话框
@@ -237,16 +238,16 @@ function addRow() {
   addForm.password = '';
   addForm.name = '';
   addForm.age = '';
-  addForm.sex = '男';
+  addForm.sex = '1';
   addForm.tel = '';
-  addForm.enable = '禁用';
+  addForm.enable = '0';
   showAddDialog.value = true;
 }
 
 async function addUser() {
+
+  console.log('addForm:',addForm)
   try {
-    addForm.sex = addForm.sex === '男' ? 1 : 0;
-    addForm.enable = addForm.enable === '启用' ? 1 : 0;
     await save(addForm);
     showAddDialog.value = false;
     search();
@@ -303,9 +304,7 @@ async function editRow(row) {
 // 保存更改
 async function saveChanges() {
   try {
-    editForm.sex = editForm.sex === '男' ? 1 : 0;
-    editForm.admin = editForm.admin === '是' ? 1 : 0;
-    editForm.enable = editForm.enable === '启用' ? 1 : 0;
+    editForm.sex = editForm.sex === '1' ? 1 : 0;
     await update(editForm);
     dialogVisible.value = false;
     search();
@@ -453,42 +452,40 @@ function toggleStatus(row, enable) {
 
 <!--样式-->
 <style scoped>
-.flex {
-  display: flex;
-  margin: 20px 20px 20px 20px;
-}
 
 .breadcrumb{
   margin: 20px;
   font-size: 15px;
 }
 
-.usernameInput {
+.flex {
+  display: flex;
+  margin: 20px 0 20px 20px;
+  align-items: center;
+}
+
+.flex-grow{
+  flex-grow: 1;
+}
+
+.usernameInput, .nameInput, .searchButton {
   height: 35px;
+}
+
+.usernameInput, .nameInput {
   width: 200px;
 }
 
 .nameInput {
-  height: 35px;
-  width: 200px;
   margin-left: 20px;
 }
 
-.searchButton {
-  height: 35px;
-  margin-left: 30px;
-}
-
-.addButton {
-  height: 35px;
-}
-
-.batchDeleteButton {
+.addButton, .batchDeleteButton {
   height: 35px;
 }
 
 .userTable {
-  width: 97%;
+  width: 100%;
   margin-left: 20px;
 }
 
