@@ -200,7 +200,7 @@ import axios from 'axios';
 import {ElMessage} from "element-plus";
 
 //变量
-const tokenVO = JSON.parse(sessionStorage.getItem('authToken'));
+const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
 const records = ref([]);
 const selectedRows = ref([]);

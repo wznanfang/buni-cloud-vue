@@ -53,8 +53,8 @@ import {API_BASE_URL} from '../config.js';
 
 const route = useRoute();
 const router = useRouter();
-const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-const tokenVO = JSON.parse(sessionStorage.getItem('authToken'));
+const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
 
 // 计算需要展开的菜单项
@@ -86,8 +86,8 @@ const logout = async () => {
     });
     const result = await response.json();
     if (result.code === 200) {
-      sessionStorage.removeItem('userInfo');
-      sessionStorage.removeItem('authToken');
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('authToken');
       ElMessage.success('退出登录');
       await router.push({name: 'Login'});
     } else {
