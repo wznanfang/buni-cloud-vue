@@ -21,8 +21,10 @@
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" type="primary" >新增</el-button>
+      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
       <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
+      <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
+      <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>
     </div>
     <el-table
         class="userTable"
@@ -48,7 +50,7 @@
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" type="primary">编辑</el-button>
-            <el-button @click="deleted(scope.row)" type="danger" >删除</el-button>
+            <el-button @click="deleted(scope.row)" type="danger">删除</el-button>
             <el-button v-if="scope.row.enable === '启用'" @click="toggleStatus(scope.row, false)" type="warning">禁用</el-button>
             <el-button v-else @click="toggleStatus(scope.row, true)" type="warning">启用</el-button>
           </div>
@@ -246,7 +248,7 @@ function addRow() {
 
 async function addUser() {
 
-  console.log('addForm:',addForm)
+  console.log('addForm:', addForm)
   try {
     await save(addForm);
     showAddDialog.value = false;
@@ -374,6 +376,35 @@ function batchDelete() {
   })
 }
 
+//批量启用-禁用
+function batchEnable(enable) {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请先选择数据');
+    return;
+  }
+  const ids = selectedRows.value.map(row => row.id);
+  const data = {
+    idVOs: {ids},
+    enable: enable ? 1 : 0
+  };
+  axios.put(`${API_BASE_URL}/user/v1/user/batchEnable`, data, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    },
+  }).then(response => {
+    if (response.data.code === 200) {
+      ElMessage.success('操作成功');
+      records.value = records.value.filter(item => !ids.includes(item.id));
+      selectedRows.value = [];
+      search();
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
+}
+
+
 //根据id查询
 function findById(id) {
   return axios.get(`${API_BASE_URL}/user/v1/user/${id}`, {
@@ -456,7 +487,7 @@ function toggleStatus(row, enable) {
 <!--样式-->
 <style scoped>
 
-.breadcrumb{
+.breadcrumb {
   margin: 30px 0 20px 20px;
   font-size: 15px;
 }
@@ -467,7 +498,7 @@ function toggleStatus(row, enable) {
   align-items: center;
 }
 
-.flex-grow{
+.flex-grow {
   flex-grow: 1;
 }
 
@@ -483,7 +514,7 @@ function toggleStatus(row, enable) {
   margin-left: 20px;
 }
 
-.addButton, .batchDeleteButton {
+.addButton, .batchDeleteButton, .batchEnableButton, .batchForbiddenButton {
   height: 35px;
 }
 
