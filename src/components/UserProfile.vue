@@ -100,11 +100,10 @@ function saveChanges() {
     }
   }).then(response => {
     if (response.data.code === 200) {
-      ElMessage.success('信息保存成功');
-      store.commit('myself', mySelfInfo.value);
+      ElMessage.success('修改成功');
       myself();
     } else {
-      ElMessage.error('保存信息失败');
+      ElMessage.error('修改失败');
     }
   })
 }
