@@ -96,14 +96,13 @@
               <el-input v-model="addForm.age" clearable></el-input>
             </el-form-item>
           </el-col>
-
         </el-row>
         <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="性别">
               <el-select v-model="addForm.sex" placeholder="请选择性别">
-                <el-option label="男" value="1"></el-option>
-                <el-option label="女" value="0"></el-option>
+                <el-option label="男" value='1'></el-option>
+                <el-option label="女" value='0'></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -156,8 +155,8 @@
           <el-col :span="11">
             <el-form-item label="性别">
               <el-select v-model="editForm.sex" placeholder="请选择性别">
-                <el-option label="男" value="1"></el-option>
-                <el-option label="女" value="0"></el-option>
+                <el-option label="男" value='1'></el-option>
+                <el-option label="女" value='0'></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -247,8 +246,6 @@ function addRow() {
 }
 
 async function addUser() {
-
-  console.log('addForm:', addForm)
   try {
     await save(addForm);
     showAddDialog.value = false;
@@ -305,11 +302,10 @@ async function editRow(row) {
 
 // 保存更改
 async function saveChanges() {
-  console.log(editForm)
   try {
-    editForm.sex = editForm.sex === '男' ? 1 : 0;
-    editForm.enable = editForm.enable === '启用' ? 1 : 0;
-    editForm.admin = editForm.admin === '是' ? 1 : 0;
+    editForm.sex = editForm.sex === '男' || editForm.sex === '1' ? 1 : 0;
+    editForm.enable = editForm.enable === '启用' || editForm.enable === '1' ? 1 : 0;
+    editForm.admin = editForm.admin === '是' || editForm.admin === '1' ? 1 : 0;
     await update(editForm);
     dialogVisible.value = false;
     search();
