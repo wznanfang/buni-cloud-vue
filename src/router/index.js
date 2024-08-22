@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import Login from '@/components/Login.vue';
-import CommonLayout from '@/components/CommonLayout.vue';
 import Home from '@/components/Home.vue';
 import User from '@/components/User.vue';
 import Role from '@/components/Role.vue';
@@ -14,11 +13,6 @@ const routes = [
         path: '/Login',
         name: 'Login',
         component: Login
-    },
-    {
-        path: '/CommonLayout',
-        name: 'CommonLayout',
-        component: CommonLayout
     },
     {
         path: '/Home',
