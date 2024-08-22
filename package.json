@@ -12,8 +12,10 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@vue/shared": "^3.4.37",
     "axios": "^1.7.4",
+    "echarts": "^5.5.1",
     "element-plus": "^2.8.0",
     "vue": "^3.4.29",
+    "vue-echarts": "^7.0.3",
     "vue-router": "^4.4.3",
     "vuex": "^4.1.0"
   },

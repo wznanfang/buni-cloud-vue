@@ -4,16 +4,87 @@
       <el-breadcrumb-item>首页</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="page-content">
-      <span>欢迎来到不逆云首页</span>
+      <v-chart autoresize :option="lineChartOptions" style="height: 350px;"></v-chart>
     </div>
   </CommonLayout>
 </template>
 
 <script setup>
 import CommonLayout from '@/components/base/CommonLayout.vue';
+import {onMounted, ref} from 'vue';
+import axios from 'axios';
+import {API_BASE_URL} from "@/config.js";
+
+const tokenVO = JSON.parse(localStorage.getItem('authToken'));
+const token = 'bearer ' + tokenVO.token;
+
+// 在组件挂载时请求数据
+onMounted(() => {
+  fetchData();
+});
+
+
+// 异步获取数据并更新图表配置
+const fetchData = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user/v1/user/statistics`, {
+      headers: {
+        Authorization: token
+      },
+      params: {
+        days: 7
+      }
+    });
+    const result = response.data.result;
+    const dates = result.map(item => item.createTime);
+    const values = result.map(item => item.newUserCount);
+
+    //填充数据
+    lineChartOptions.value = {
+      ...lineChartOptions.value,
+      xAxis: {
+        ...lineChartOptions.value.xAxis,
+        data: dates
+      },
+      series: [
+        {
+          ...lineChartOptions.value.series[0],
+          data: values
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('获取数据失败:', error);
+  }
+};
+
+// 折线图配置
+const lineChartOptions = ref({
+  title: {
+    text: '用户注册数'
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: []
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: '注册数',
+      type: 'line',
+      data: []
+    }
+  ]
+});
+
 
 </script>
-
 
 
 <style scoped>
@@ -24,6 +95,7 @@ import CommonLayout from '@/components/base/CommonLayout.vue';
 }
 
 .page-content {
+  width: 98%;
   margin: 30px 0 20px 20px;
 }
 

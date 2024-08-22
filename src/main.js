@@ -6,6 +6,8 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'; // 导入中文语言包
 import router from './router';
 import setupInterceptors from './baseConfig/axios-interceptors.js'; // 引入拦截器配置
 import { store } from './baseConfig/store.js';
+import * as echarts from "echarts";
+import ECharts from "vue-echarts";
 
 const app = createApp(App)
 
@@ -28,7 +30,10 @@ app.use(ElementPlus, {
     }
 });
 
-app.use(router);
+setupInterceptors();
+
+app.use(router,store,echarts);
 app.use(store);
-setupInterceptors(); // 配置拦截器
+app.use(echarts);
 app.mount('#app');
+app.component('v-chart', ECharts);
