@@ -8,6 +8,7 @@ const router = useRouter();
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
 
+//退出登录
 export async function logout() {
     try {
         const response = await axios.post(`${API_BASE_URL}/user/v1/loginOut`, {

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
+//拦截器，判断是否是401
 const setupInterceptors = () => {
     axios.interceptors.response.use(
         response => response,

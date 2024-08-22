@@ -1,6 +1,6 @@
-// 全局用户数据存储
 import {createStore} from "vuex";
 
+// 全局用户数据存储
 export const store = createStore({
     state() {
         return {
