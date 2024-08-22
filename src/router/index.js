@@ -3,6 +3,7 @@ import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
 import User from '@/components/User.vue';
 import Role from '@/components/Role.vue';
+import UserProfile from '@/components/UserProfile.vue';
 
 const routes = [
     {
@@ -13,6 +14,12 @@ const routes = [
         path: '/Login',
         name: 'Login',
         component: Login
+    },
+    {
+        path: '/UserProfile',
+        name: 'UserProfile',
+        component: UserProfile,
+        meta: {requiresAuth: true},
     },
     {
         path: '/Home',

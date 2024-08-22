@@ -1,6 +1,6 @@
 <template>
   <span class="logo">不逆云系统</span>
-  <el-dropdown><span class="el-dropdown-link">{{ userInfo.name }}</span>
+  <el-dropdown><span class="el-dropdown-link">{{ loginUser.name }}</span>
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
@@ -14,33 +14,37 @@
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
 import {API_BASE_URL} from '../config.js';
+import axios from 'axios';
 
 const router = useRouter();
-const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+const loginUser = JSON.parse(localStorage.getItem('loginUser'));
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
 
+function myself() {
+  router.push('/UserProfile')
+}
+
+
 // 清理会话信息的函数
-const logout = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/user/v1/loginOut`, {
-      method: 'POST',
-      headers: {
-        'Authorization': token
-      }
-    });
-    const result = await response.json();
-    if (result.code === 200) {
-      localStorage.removeItem('userInfo');
+function logout() {
+  axios.post(`${API_BASE_URL}/user/v1/loginOut`, {
+    headers: {
+      'Authorization': token
+    }
+  }).then(async response => {
+    if (response.data.code === 200) {
+      localStorage.removeItem('loginUser');
       localStorage.removeItem('authToken');
       ElMessage.success('退出登录');
       await router.push({name: 'Login'});
     } else {
       ElMessage.error('退出登录失败');
     }
-  } catch (error) {
-    console.error('退出登录失败:', error);
-  }
+  }).catch(() => {
+    ElMessage.error('退出登录失败');
+  })
+
 }
 </script>
 

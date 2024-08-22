@@ -46,7 +46,7 @@ const handleLogin = async () => {
 
     if (response.ok) {
       if (result.code === 200) {
-        localStorage.setItem('userInfo', JSON.stringify(result.result));
+        localStorage.setItem('loginUser', JSON.stringify(result.result));
         localStorage.setItem('authToken', JSON.stringify(result.result.tokenVO));
         ElMessage.success('登录成功');
         await router.push({name: 'Home'});

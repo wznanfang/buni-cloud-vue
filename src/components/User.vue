@@ -489,7 +489,7 @@ function toggleStatus(row, enable) {
 
 .breadcrumb {
   margin: 30px 0 20px 20px;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .flex {
