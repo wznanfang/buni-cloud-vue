@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import {computed} from 'vue';
 import {useRoute} from 'vue-router';
-import Header from '@/components/Header.vue';
+import Header from '@/components/base/Header.vue';
 
 const route = useRoute();
 

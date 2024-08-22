@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import CommonLayout from "@/components/CommonLayout.vue";
+import CommonLayout from "@/components/base/CommonLayout.vue";
 
 import {onMounted, reactive, ref} from 'vue';
 import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus';
@@ -80,7 +80,7 @@ import {useStore} from 'vuex';
 import axios from "axios";
 import {API_BASE_URL} from "@/config.js";
 
-import {logout} from "../auth";
+import {logout} from "@/baseConfig/auth.js";
 
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));

@@ -4,8 +4,8 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'; // 导入中文语言包
 import router from './router';
-import setupInterceptors from './axios-interceptors'; // 引入拦截器配置
-import { store } from './store';
+import setupInterceptors from './baseConfig/axios-interceptors.js'; // 引入拦截器配置
+import { store } from './baseConfig/store.js';
 
 const app = createApp(App)
 

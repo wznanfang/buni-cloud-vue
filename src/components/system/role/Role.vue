@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import CommonLayout from "@/components/CommonLayout.vue";
+import CommonLayout from "@/components/base/CommonLayout.vue";
 </script>
 
 <style scoped>

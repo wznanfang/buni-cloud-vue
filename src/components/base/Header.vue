@@ -12,7 +12,7 @@
 
 <script setup>
 import {useRouter} from 'vue-router';
-import {logout} from "../auth";
+import {logout} from "@/baseConfig/auth.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
