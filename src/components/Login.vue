@@ -19,6 +19,7 @@
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
+import axios from 'axios';
 import {API_BASE_URL} from '../config.js';
 import {Encrypt} from '../baseConfig/secret.js';
 
@@ -30,38 +31,25 @@ const form = ref({
 });
 
 const handleLogin = async () => {
-  console.log(form.value.password)
   let password = Encrypt(form.value.password)
-  console.log(password)
-  try {
-    const response = await fetch(`${API_BASE_URL}/user/v1/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: form.value.username,
-        password: password
-      })
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      if (result.code === 200) {
-        localStorage.setItem('loginUser', JSON.stringify(result.result));
-        localStorage.setItem('authToken', JSON.stringify(result.result.tokenVO));
-        ElMessage.success('登录成功');
-        await router.push({name: 'Home'});
-      } else {
-        ElMessage.error(result.message);
-      }
-    } else {
-      console.error('登录失败:', result);
-    }
-  } catch (error) {
-    console.error('请求错误:', error);
+  const body = {
+    username: form.value.username,
+    password: password
   }
+  axios.post(`${API_BASE_URL}/user/v1/login`, body, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      localStorage.setItem('loginUser', JSON.stringify(response.data.result));
+      localStorage.setItem('authToken', JSON.stringify(response.data.result.tokenVO));
+      ElMessage.success('登录成功');
+      router.push({name: 'Home'});
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
 };
 </script>
 

@@ -12,7 +12,6 @@
 <script setup>
 import CommonLayout from '@/components/base/CommonLayout.vue';
 import {onMounted, ref} from 'vue';
-import {ElMessage} from "element-plus";
 import axios from 'axios';
 import {API_BASE_URL} from "@/config.js";
 
