@@ -11,6 +11,12 @@ const setupInterceptors = () => {
                 sessionStorage.removeItem('authToken');
                 window.location.href = '/Login';
             }
+            if (error.response && error.response.status === 403) {
+                ElMessage.error('无权访问');
+            }
+            if (error.response && error.response.status === 500) {
+                ElMessage.error('服务器错误，请稍后再试');
+            }
             return Promise.reject(error);
         }
     );

@@ -50,8 +50,6 @@ const fetchData = async () => {
         }
       ]
     };
-  }).catch(error => {
-    ElMessage.error(error.response.data.message);
   })
 };
 
