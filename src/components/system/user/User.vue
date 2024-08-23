@@ -201,6 +201,7 @@ import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
 import {Plus, Delete, Edit} from '@element-plus/icons-vue'
+import {Encrypt} from '@/baseConfig/secret.js';
 
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
@@ -249,6 +250,7 @@ function addRow() {
 
 async function addUser() {
   try {
+    addForm.password = Encrypt(addForm.password);
     await save(addForm);
     showAddDialog.value = false;
     search();

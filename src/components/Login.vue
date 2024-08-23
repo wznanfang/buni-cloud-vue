@@ -20,16 +20,19 @@ import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
 import {API_BASE_URL} from '../config.js';
+import {Encrypt} from '../baseConfig/secret.js';
 
+const router = useRouter();
 
 const form = ref({
   username: '',
   password: ''
 });
 
-const router = useRouter();
-
 const handleLogin = async () => {
+  console.log(form.value.password)
+  let password = Encrypt(form.value.password)
+  console.log(password)
   try {
     const response = await fetch(`${API_BASE_URL}/user/v1/login`, {
       method: 'POST',
@@ -38,7 +41,7 @@ const handleLogin = async () => {
       },
       body: JSON.stringify({
         username: form.value.username,
-        password: form.value.password
+        password: password
       })
     });
 
