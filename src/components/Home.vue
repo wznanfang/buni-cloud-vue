@@ -13,6 +13,7 @@
 import CommonLayout from '@/components/base/CommonLayout.vue';
 import {onMounted, ref} from 'vue';
 import axios from 'axios';
+import {ElMessage} from 'element-plus';
 import {API_BASE_URL} from "@/config.js";
 
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
@@ -32,23 +33,27 @@ const fetchData = async () => {
     },
     params: {days: 7}
   }).then(response => {
-    const result = response.data.result;
-    const dates = result.map(item => item.createTime);
-    const values = result.map(item => item.newUserCount);
-    //填充数据
-    lineChartOptions.value = {
-      ...lineChartOptions.value,
-      xAxis: {
-        ...lineChartOptions.value.xAxis,
-        data: dates
-      },
-      series: [
-        {
-          ...lineChartOptions.value.series[0],
-          data: values
-        }
-      ]
-    };
+    if (response.data.code === 200) {
+      const result = response.data.result;
+      const dates = result.map(item => item.createTime);
+      const values = result.map(item => item.newUserCount);
+      //填充数据
+      lineChartOptions.value = {
+        ...lineChartOptions.value,
+        xAxis: {
+          ...lineChartOptions.value.xAxis,
+          data: dates
+        },
+        series: [
+          {
+            ...lineChartOptions.value.series[0],
+            data: values
+          }
+        ]
+      };
+    } else {
+      ElMessage.error(response.data.message);
+    }
   })
 };
 
