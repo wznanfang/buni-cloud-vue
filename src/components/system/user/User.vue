@@ -21,7 +21,7 @@
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
+      <el-button @click="addRow" class="addButton" :icon="Plus" type="primary"></el-button>
       <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
       <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
       <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>
@@ -39,20 +39,21 @@
     >
       <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="username" label="用户名" width="120"/>
-      <el-table-column prop="name" label="姓名" width="150"/>
+      <el-table-column prop="name" label="姓名" width="120"/>
       <el-table-column prop="age" label="年龄" width="90"/>
-      <el-table-column prop="sex" label="性别" width="100"/>
-      <el-table-column prop="tel" label="电话" width="150"/>
-      <el-table-column prop="enable" label="状态" width="100"/>
-      <el-table-column prop="admin" label="管理员" width="100"/>
+      <el-table-column prop="sex" label="性别" width="90"/>
+      <el-table-column prop="tel" label="电话" width="120"/>
+      <el-table-column prop="enable" label="状态" width="90"/>
+      <el-table-column prop="admin" label="管理员" width="90"/>
       <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column prop="createTime" label="操作" fixed="right" width="250">
+      <el-table-column prop="createTime" label="操作" fixed="right" width="340">
         <template v-slot="scope">
           <div class="button-container">
-            <el-button @click="editRow(scope.row)" type="primary">编辑</el-button>
-            <el-button @click="deleted(scope.row)" type="danger">删除</el-button>
-            <el-button v-if="scope.row.enable === '启用'" @click="toggleStatus(scope.row, false)" type="warning">禁用</el-button>
-            <el-button v-else @click="toggleStatus(scope.row, true)" type="warning">启用</el-button>
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
+            <el-button @click="deleted(scope.row)" :icon="Delete" type="danger"></el-button>
+            <el-button v-if="scope.row.enable === '启用'" @click="enableStatus(scope.row, false)" type="warning">禁用</el-button>
+            <el-button v-else @click="enableStatus(scope.row, true)" type="warning">启用</el-button>
+            <el-button @click="resetPassword(scope.row)" type="danger">重置密码</el-button>
           </div>
         </template>
       </el-table-column>
@@ -199,6 +200,7 @@ import {API_BASE_URL} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
+import {Plus, Delete, Edit} from '@element-plus/icons-vue'
 
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
@@ -456,7 +458,7 @@ function handleCurrentChange(val) {
   search();
 }
 
-function toggleStatus(row, enable) {
+function enableStatus(row, enable) {
   const data = {
     id: row.id,
     enable: enable ? 1 : 0
@@ -473,6 +475,20 @@ function toggleStatus(row, enable) {
       search();
     } else {
       ElMessage.error(result.message);
+    }
+  })
+}
+
+function resetPassword(row) {
+  axios.put(`${API_BASE_URL}/user/v1/user/resetPassword/${row.id}`, null,{
+    headers: {
+      'Authorization': token
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      ElMessage.success('重置成功');
+    } else {
+      ElMessage.error(response.data.message);
     }
   })
 }
