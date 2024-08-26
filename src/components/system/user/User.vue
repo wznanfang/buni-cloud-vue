@@ -21,7 +21,7 @@
       <el-button @click="search" class="searchButton" type="primary">查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" :icon="Plus" type="primary"></el-button>
+      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
       <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
       <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
       <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>
