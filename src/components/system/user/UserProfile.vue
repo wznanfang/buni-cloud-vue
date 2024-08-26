@@ -5,6 +5,8 @@
     </el-breadcrumb>
     <el-card class="user-card" :body-style="{ padding: '20px' }">
       <h2>个人信息</h2>
+      <el-avatar class="myself-avatar" :src="mySelfInfo.avatar"/>
+
       <el-form label-width="100px" class="user-form">
         <el-row gutter="20">
           <el-col :span="10">
@@ -101,6 +103,7 @@ function myself() {
     }
   }).then(response => {
     if (response.data.code === 200) {
+      console.log(response.data.result);
       mySelfInfo.value = response.data.result;
       mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
       mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
@@ -167,10 +170,16 @@ function updatePassword() {
   margin: 20px 20px;
 }
 
+.myself-avatar {
+  display: block;
+  margin: 0 auto;
+  width: 100px;
+  height: 100px;
+}
+
 
 .user-form {
-  margin-left: 100px;
-  margin-bottom: 20px;
+  margin: 50px 0 20px 100px;
 }
 
 .update-container, .updatePassword-container {

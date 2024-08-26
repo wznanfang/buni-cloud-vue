@@ -3,7 +3,6 @@
     <span>不逆云系统</span>
   </div>
   <div class="header-container">
-    <el-avatar class="avatar" src="{{loginUser.avator}}"/>
     <el-dropdown>
       <span class="el-dropdown-link">{{ loginUser.name }}</span>
       <template #dropdown>
@@ -13,6 +12,7 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
+    <el-avatar class="avatar" :src="loginUser.avatar"/>
   </div>
 </template>
 
@@ -39,14 +39,6 @@ function loginOut() {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-right: 20px;
-}
-
-.avatar {
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  margin-right: 20px;
 }
 
 .el-dropdown-link {
@@ -55,7 +47,12 @@ function loginOut() {
   cursor: pointer;
   font-size: 16px;
   outline: none;
-  color: white;
+  color: rgb(245, 245, 245);
+}
+
+
+.avatar {
+  margin-left: 20px;
 }
 
 </style>
