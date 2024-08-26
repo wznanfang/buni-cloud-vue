@@ -30,7 +30,7 @@ const form = ref({
   password: ''
 });
 
-const handleLogin = async () => {
+function handleLogin() {
   let password = Encrypt(form.value.password)
   const body = {
     username: form.value.username,
@@ -50,7 +50,7 @@ const handleLogin = async () => {
       ElMessage.error(response.data.message);
     }
   })
-};
+}
 </script>
 
 <style scoped>

@@ -77,11 +77,12 @@ import CommonLayout from "@/components/base/CommonLayout.vue";
 import {onMounted, reactive, ref} from 'vue';
 import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus';
 import {useStore} from 'vuex';
+import {useRouter} from 'vue-router';
 import axios from "axios";
 import {API_BASE_URL} from "@/config.js";
-
 import {logout} from "@/baseConfig/auth.js";
 
+const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
@@ -143,7 +144,7 @@ function updatePassword() {
   }).then(response => {
     if (response.data.code === 200) {
       ElMessage.success('修改成功');
-      logout();
+      logout(router);
     } else {
       ElMessage.error(response.data.message);
     }

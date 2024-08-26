@@ -82,8 +82,8 @@ const handleClose = (key: string, keyPath: string[]) => {
   justify-content: space-between;
   color: white;
   font-size: 20px;
-  border: none; /* 去除边框 */
-  box-shadow: none; /* 去除阴影 */
+  border: none;
+  box-shadow: none;
 }
 
 .aside {
