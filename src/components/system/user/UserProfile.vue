@@ -5,8 +5,9 @@
     </el-breadcrumb>
     <el-card class="user-card" :body-style="{ padding: '50px' }">
       <div class="avatar-icon">
-        <el-avatar class="myself-avatar" :src="mySelfInfo.avatar"/>
-        <el-button class="edit-avatar" type="primary" plain>修改头像</el-button>
+        <el-avatar class="myself-avatar" :src="avatarUrl"/>
+        <el-button class="edit-avatar" @click="selectAvatar" type="primary" plain>修改头像</el-button>
+        <input ref="fileInput" type="file" accept="image/*" style="display: none;" @change="changeAvatar"/>
       </div>
       <h2>个人信息</h2>
       <el-form label-width="100px" class="user-form">
@@ -84,7 +85,7 @@ import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import axios from "axios";
 import {API_BASE_URL} from "@/config.js";
-import {logout} from "@/baseConfig/auth.js";
+import {logout, getUserInfo} from "@/baseConfig/auth.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
@@ -92,27 +93,65 @@ const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
 const store = useStore();
 const mySelfInfo = ref({});
+const avatarUrl = ref('');
 
 onMounted(() => {
   myself()
 });
 
 function myself() {
-  const id = loginUser.id;
-  return axios.get(`${API_BASE_URL}/user/v1/user/${id}`, {
+  getUserInfo(loginUser.id, token).then(result => {
+    mySelfInfo.value = result;
+    mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
+    mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
+    store.commit('myself', mySelfInfo.value);
+    avatarUrl.value = result.avatar;
+    loginUser.avatar = result.avatar;
+  })
+}
+
+function selectAvatar() {
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput) {
+    fileInput.click();
+  }
+}
+
+function changeAvatar(event) {
+  const file = event.target.files[0]
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    axios.post(`${API_BASE_URL}/file/v1/upload`, formData, {
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(response => {
+      if (response.data.code === 200) {
+        editUserAvatar(response.data.result);
+      } else {
+        ElMessage.error('修改失败');
+      }
+    })
+  }
+}
+
+function editUserAvatar(avatar) {
+  const body = {
+    id: loginUser.id,
+    avatar: avatar
+  }
+  axios.put(`${API_BASE_URL}/user/v1/user/avatar`, body, {
     headers: {
-      'Authorization': token
+      'Authorization': token,
     }
-  }).then(response => {
+  }).then(async response => {
     if (response.data.code === 200) {
-      console.log(response.data.result);
-      mySelfInfo.value = response.data.result;
-      mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
-      mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
-      store.commit('myself', mySelfInfo.value);
-      return response;
+      ElMessage.success('修改成功');
+      await myself()
     } else {
-      ElMessage.error('获取个人信息失败');
+      ElMessage.error('修改失败');
     }
   })
 }

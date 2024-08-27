@@ -21,5 +21,18 @@ export function logout(router) {
             ElMessage.error('退出登录失败');
         }
     })
+}
 
+export function getUserInfo(id, token) {
+    return axios.get(`${API_BASE_URL}/user/v1/user/${id}`, {
+        headers: {
+            'Authorization': token
+        }
+    }).then(response => {
+        if (response.data.code === 200) {
+            return response.data.result;
+        } else {
+            throw new Error('获取个人信息失败');
+        }
+    });
 }

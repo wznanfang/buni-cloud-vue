@@ -22,6 +22,7 @@ import {ElMessage} from 'element-plus';
 import axios from 'axios';
 import {API_BASE_URL} from '../config.js';
 import {Encrypt} from '../baseConfig/secret.js';
+import {getUserInfo} from "@/baseConfig/auth.js";
 
 const router = useRouter();
 
@@ -40,10 +41,16 @@ function handleLogin() {
     headers: {
       'Content-Type': 'application/json'
     }
-  }).then(response => {
+  }).then(async response => {
     if (response.data.code === 200) {
-      localStorage.setItem('loginUser', JSON.stringify(response.data.result));
-      localStorage.setItem('authToken', JSON.stringify(response.data.result.tokenVO));
+      const authToken = response.data.result.tokenVO;
+      await getUserInfo(response.data.result.id, authToken.token).then(res => {
+        localStorage.setItem('loginUser', JSON.stringify(res));
+        console.log(res);
+      }).catch(err => {
+        ElMessage.error("登录失败");
+      })
+      localStorage.setItem('authToken', JSON.stringify(authToken));
       ElMessage.success('登录成功');
       router.push({name: 'Home'});
     } else {
