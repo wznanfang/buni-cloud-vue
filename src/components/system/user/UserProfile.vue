@@ -106,7 +106,7 @@ function myself() {
     mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
     store.commit('myself', mySelfInfo.value);
     avatarUrl.value = result.avatar;
-    loginUser.avatar = result.avatar;
+    localStorage.setItem('loginUser', JSON.stringify(result));
   })
 }
 

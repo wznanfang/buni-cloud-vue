@@ -4,7 +4,7 @@
   </div>
   <div class="header-container">
     <el-dropdown>
-      <span class="el-dropdown-link">{{ loginUser.name }}</span>
+      <span class="el-dropdown-link">{{loginUser.name}}</span>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
@@ -19,9 +19,10 @@
 <script setup>
 import {useRouter} from 'vue-router';
 import {logout} from "@/baseConfig/auth.js";
+import {ref} from "vue";
 
 const router = useRouter();
-const loginUser = JSON.parse(localStorage.getItem('loginUser'));
+const loginUser = ref(JSON.parse(localStorage.getItem('loginUser')));
 
 function myself() {
   router.push('/UserProfile')
