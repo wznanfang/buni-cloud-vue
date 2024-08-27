@@ -3,10 +3,12 @@
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item>个人中心</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-card class="user-card" :body-style="{ padding: '20px' }">
+    <el-card class="user-card" :body-style="{ padding: '50px' }">
+      <div class="avatar-icon">
+        <el-avatar class="myself-avatar" :src="mySelfInfo.avatar"/>
+        <el-button class="edit-avatar" type="primary" plain>修改头像</el-button>
+      </div>
       <h2>个人信息</h2>
-      <el-avatar class="myself-avatar" :src="mySelfInfo.avatar"/>
-
       <el-form label-width="100px" class="user-form">
         <el-row gutter="20">
           <el-col :span="10">
@@ -170,11 +172,24 @@ function updatePassword() {
   margin: 20px 20px;
 }
 
+.avatar-icon {
+  display: block;
+  margin: 0 auto;
+  width: 150px;
+  height: 150px;
+}
+
 .myself-avatar {
   display: block;
   margin: 0 auto;
   width: 100px;
   height: 100px;
+}
+
+.edit-avatar {
+  display: block;
+  margin: 10px auto;
+  height: 35px;
 }
 
 
@@ -190,6 +205,7 @@ function updatePassword() {
 
 .editButton, .updatePasswordButton {
   display: flex;
+  height: 35px;
 }
 
 </style>
