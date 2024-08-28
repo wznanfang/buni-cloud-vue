@@ -94,6 +94,7 @@
                   placeholder="请选择"
                   @change="handleChange"
                   clearable
+                  :show-all-levels = false
               ></el-cascader>
             </el-form-item>
           </el-col>
@@ -114,6 +115,65 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showAddDialog = false">取消</el-button>
+      <el-button type="primary" @click="addAuthority">保存</el-button>
+    </span>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑对话框 -->
+    <el-dialog v-model="showEditDialog" title="修改权限" width="35%">
+      <el-form :model="editForm" label-width="100px">
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="名字">
+              <el-input v-model="editForm.name" clearable></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="标识码">
+              <el-input v-model="editForm.code" clearable></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="类型">
+              <el-select v-model="editForm.type" placeholder="请选择类型">
+                <el-option label="模块" value='0'></el-option>
+                <el-option label="菜单" value='1'></el-option>
+                <el-option label="按钮" value='2'></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="父级菜单">
+              <el-cascader
+                  v-model="editForm.parentId"
+                  :options="cascaderOptions"
+                  :props="cascaderProps"
+                  placeholder="请选择"
+                  @change="handleChange"
+                  clearable
+              ></el-cascader>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="序号">
+              <el-input v-model="editForm.sort" clearable></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="接口地址">
+              <el-input v-model="editForm.url" clearable></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <template #footer>
+    <span class="dialog-footer">
+      <el-button @click="showEditDialog = false">取消</el-button>
       <el-button type="primary" @click="addAuthority">保存</el-button>
     </span>
       </template>
@@ -166,7 +226,6 @@ function fetchParentMenus() {
       'Authorization': token
     }
   }).then(response => {
-    console.log(response);
     if (response.data.code === 200) {
       cascaderOptions.value = response.data.result;
     } else {
@@ -181,6 +240,7 @@ function handleChange(selectedValues) {
 
 //新增
 const showAddDialog = ref(false);
+
 function addRow() {
   fetchParentMenus();
   showAddDialog.value = true;
@@ -188,9 +248,9 @@ function addRow() {
 
 const addForm = reactive({
   name: '',
+  code: '',
   parentId: '',
   type: '',
-  code: '',
   sort: '',
   url: '',
 });
@@ -221,6 +281,78 @@ function save() {
   })
 }
 
+
+//编辑
+const showEditDialog = ref(false);
+const editForm = reactive({
+  name: '',
+  code: '',
+  parentId: '',
+  type: '',
+  sort: '',
+  url: '',
+});
+
+// 显示编辑对话框
+async function editRow(row) {
+  await fetchParentMenus();
+  try {
+    const response = await findById(row.id);
+    let type = response.data.result.type;
+    editForm.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
+    editForm.id = response.data.result.id;
+    editForm.name = response.data.result.name;
+    editForm.code = response.data.result.code;
+    editForm.parentId = response.data.result.parentId;
+    editForm.sort = response.data.result.sort;
+    editForm.url = response.data.result.url;
+    showEditDialog.value = true;
+  } catch (error) {
+    ElMessage.error('查询失败，请稍后再试');
+  }
+}
+
+// 保存更改
+async function saveChanges() {
+  try {
+    // await update(editForm);
+    showEditDialog.value = false;
+    search();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function update(authority) {
+  return axios.put(`${API_BASE_URL}/user/v1/authority`, authority, {
+    headers: {
+      'Authorization': token,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      ElMessage.success('修改成功');
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  });
+}
+
+//根据id查询
+function findById(id) {
+  return axios.get(`${API_BASE_URL}/user/v1/authority/${id}`, {
+    headers: {
+      'Authorization': token
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      return response;
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
+}
+
 //分页查询
 function search() {
   axios.get(`${API_BASE_URL}/user/v1/authority`, {
@@ -238,15 +370,7 @@ function search() {
       records.value = result.result.records;
       totalRecords.value = result.result.total;
       records.value.forEach(item => {
-        if (item.type === 0) {
-          item.type = '模块';
-        }
-        if (item.type === 1) {
-          item.type = '菜单';
-        }
-        if (item.type === 2) {
-          item.type = '按钮';
-        }
+        item.type = item.type === 0 ? "模块" : item.type === 1 ? "菜单" : "按钮";
       })
     } else {
       ElMessage.error(result.message);
