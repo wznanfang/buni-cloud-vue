@@ -1,0 +1,309 @@
+<template>
+  <CommonLayout>
+    <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+      <el-breadcrumb-item>系统设置</el-breadcrumb-item>
+      <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <div class="flex gap-4 mb-4">
+      <el-input
+          v-model="nameInput"
+          clearable
+          class="nameInput"
+          placeholder="名字"
+      />
+      <div class="flex-grow"></div>
+      <el-button @click="search" class="searchButton" type="primary">查询</el-button>
+    </div>
+    <div class="flex justify-end mb-4">
+      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
+      <!--      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
+            <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
+            <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>-->
+    </div>
+    <el-table
+        class="userTable"
+        :data="records"
+        border
+        stripe
+        fit
+        ref="table"
+        :cell-style="{ textAlign: 'center' }"
+        :header-cell-style="{ 'text-align': 'center' }"
+        @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" fixed width="45"/>
+      <el-table-column prop="name" label="名字" width="140" show-overflow-tooltip/>
+      <el-table-column prop="type" label="类型" width="90"/>
+      <el-table-column prop="code" label="标识码" width="150"/>
+      <el-table-column prop="sort" label="序号" width="90"/>
+      <el-table-column prop="url" label="接口地址" width="190" show-overflow-tooltip/>
+      <el-table-column prop="createTime" label="创建时间" width="180"/>
+      <el-table-column label="操作" fixed="right" width="400">
+        <template v-slot="scope">
+          <div class="button-container">
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
+            <el-button @click="deleted(scope.row)" :icon="Delete" type="danger"></el-button>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="pagination-container">
+      <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 20, 30, 50, 100]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalRecords"
+      >
+      </el-pagination>
+    </div>
+
+    <!-- 新增对话框 -->
+    <el-dialog v-model="showAddDialog" title="新增权限" width="35%">
+      <el-form :model="addForm" label-width="100px">
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="名字">
+              <el-input v-model="addForm.name" clearable></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="标识码">
+              <el-input v-model="addForm.code" clearable></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="类型">
+              <el-select v-model="addForm.type" placeholder="请选择类型">
+                <el-option label="模块" value='0'></el-option>
+                <el-option label="菜单" value='1'></el-option>
+                <el-option label="按钮" value='2'></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="父级菜单">
+              <el-cascader
+                  v-model="addForm.parentId"
+                  :options="cascaderOptions"
+                  :props="cascaderProps"
+                  placeholder="请选择"
+                  @change="handleChange"
+                  clearable
+              ></el-cascader>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="15">
+          <el-col :span="11">
+            <el-form-item label="序号">
+              <el-input v-model="addForm.sort" clearable></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="接口地址">
+              <el-input v-model="addForm.url" clearable></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <template #footer>
+    <span class="dialog-footer">
+      <el-button @click="showAddDialog = false">取消</el-button>
+      <el-button type="primary" @click="addAuthority">保存</el-button>
+    </span>
+      </template>
+    </el-dialog>
+
+  </CommonLayout>
+</template>
+
+<script setup>
+//引入
+import CommonLayout from "@/components/base/CommonLayout.vue";
+import {API_BASE_URL} from '@/config.js';
+import {onMounted, reactive, ref} from 'vue';
+import axios from 'axios';
+import {ElMessage} from "element-plus";
+import {Delete, Edit} from '@element-plus/icons-vue'
+
+//变量
+const tokenVO = JSON.parse(localStorage.getItem('authToken'));
+const token = 'bearer ' + tokenVO.token;
+const records = ref([]);
+const selectedRows = ref([]);
+const currentPage = ref(1); // 当前页
+const pageSize = ref(10); // 每页显示记录数
+const totalRecords = ref(0); // 总记录数
+const nameInput = ref('');
+
+//复选框
+function handleSelectionChange(selected) {
+  selectedRows.value = selected;
+}
+
+//默认请求
+onMounted(() => {
+  search();
+});
+
+const cascaderOptions = ref([]);
+const cascaderProps = {
+  value: 'id',
+  label: 'name',
+  children: 'children',
+  checkStrictly: true,
+};
+
+//请求父级菜单
+function fetchParentMenus() {
+  axios.get(`${API_BASE_URL}/user/v1/findMenuTree`, {
+    headers: {
+      'Authorization': token
+    }
+  }).then(response => {
+    console.log(response);
+    if (response.data.code === 200) {
+      cascaderOptions.value = response.data.result;
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
+}
+
+function handleChange(selectedValues) {
+  addForm.parentId = selectedValues[selectedValues.length - 1];
+}
+
+//新增
+const showAddDialog = ref(false);
+function addRow() {
+  fetchParentMenus();
+  showAddDialog.value = true;
+}
+
+const addForm = reactive({
+  name: '',
+  parentId: '',
+  type: '',
+  code: '',
+  sort: '',
+  url: '',
+});
+
+async function addAuthority() {
+  try {
+    await save(addForm);
+    showAddDialog.value = false;
+    search();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+//新增权限
+function save() {
+  return axios.post(`${API_BASE_URL}/user/v1/authority`, addForm, {
+    headers: {
+      'Authorization': token,
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      ElMessage.success('添加成功');
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
+}
+
+//分页查询
+function search() {
+  axios.get(`${API_BASE_URL}/user/v1/authority`, {
+    headers: {
+      'Authorization': token
+    },
+    params: {
+      name: nameInput.value,
+      current: currentPage.value,
+      size: pageSize.value
+    }
+  }).then(response => {
+    const result = response.data;
+    if (result.code === 200) {
+      records.value = result.result.records;
+      totalRecords.value = result.result.total;
+      records.value.forEach(item => {
+        if (item.type === 0) {
+          item.type = '模块';
+        }
+        if (item.type === 1) {
+          item.type = '菜单';
+        }
+        if (item.type === 2) {
+          item.type = '按钮';
+        }
+      })
+    } else {
+      ElMessage.error(result.message);
+    }
+  })
+}
+
+// 分页大小改变时
+function handleSizeChange(val) {
+  pageSize.value = val;
+  search();
+}
+
+// 当前页改变时
+function handleCurrentChange(val) {
+  currentPage.value = val;
+  search();
+}
+
+</script>
+
+<style scoped>
+
+.breadcrumb {
+  margin: 30px 0 20px 20px;
+  font-size: 16px;
+}
+
+.flex {
+  display: flex;
+  margin: 30px 0 20px 20px;
+  align-items: center;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.nameInput, .searchButton {
+  height: 35px;
+}
+
+.nameInput {
+  width: 200px;
+}
+
+.userTable {
+  width: 98%;
+  margin-left: 20px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 30px;
+}
+
+
+</style>

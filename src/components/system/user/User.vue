@@ -200,7 +200,7 @@ import {API_BASE_URL} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
-import {Plus, Delete, Edit} from '@element-plus/icons-vue'
+import {Delete, Edit} from '@element-plus/icons-vue'
 import {Encrypt} from '@/baseConfig/secret.js';
 
 //变量
@@ -226,16 +226,6 @@ onMounted(() => {
 
 //新增
 const showAddDialog = ref(false);
-const addForm = reactive({
-  username: '',
-  password: '',
-  name: '',
-  age: '',
-  sex: '1',
-  tel: '',
-  enable: '0',
-});
-
 // 显示新增对话框
 function addRow() {
   addForm.username = '';
@@ -247,6 +237,16 @@ function addRow() {
   addForm.enable = '0';
   showAddDialog.value = true;
 }
+
+const addForm = reactive({
+  username: '',
+  password: '',
+  name: '',
+  age: '',
+  sex: '1',
+  tel: '',
+  enable: '0',
+});
 
 async function addUser() {
   try {
