@@ -46,7 +46,7 @@ const route = useRoute();
 
 // 计算需要展开的菜单项
 const defaultOpeneds = computed(() => {
-  if (route.path.includes('/User') || route.path.includes('/Role')) {
+  if (route.path.includes('/User') || route.path.includes('/Authority')) {
     return ['system'];
   }
   return [];
