@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router';
 import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
 import User from '@/components/system/user/User.vue';
-import Role from '@/components/system/role/Role.vue';
+import Authority from '@/components/system/authority/Authority.vue';
 import UserProfile from '@/components/system/user/UserProfile.vue';
 
 const routes = [
@@ -34,9 +34,9 @@ const routes = [
         meta: {requiresAuth: true},
     },
     {
-        path: '/Role',
-        name: 'Role',
-        component: Role,
+        path: '/Authority',
+        name: 'Authority',
+        component: Authority,
         meta: {requiresAuth: true},
     }
 ];

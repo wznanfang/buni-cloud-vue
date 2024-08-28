@@ -46,7 +46,7 @@
       <el-table-column prop="enable" label="状态" width="90"/>
       <el-table-column prop="admin" label="管理员" width="90"/>
       <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column prop="createTime" label="操作" fixed="right" width="340">
+      <el-table-column label="操作" fixed="right" width="340">
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
@@ -460,6 +460,7 @@ function handleCurrentChange(val) {
   search();
 }
 
+// 启用禁用
 function enableStatus(row, enable) {
   const data = {
     id: row.id,
@@ -481,6 +482,7 @@ function enableStatus(row, enable) {
   })
 }
 
+//重置密码
 function resetPassword(row) {
   axios.put(`${API_BASE_URL}/user/v1/user/resetPassword/${row.id}`, null,{
     headers: {

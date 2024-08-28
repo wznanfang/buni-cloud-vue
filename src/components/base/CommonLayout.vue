@@ -23,7 +23,7 @@
                     <span>系统设置</span>
                   </template>
                   <el-menu-item index="/User">用户管理</el-menu-item>
-                  <el-menu-item index="/Role">角色管理</el-menu-item>
+                  <el-menu-item index="/Authority">权限管理</el-menu-item>
                 </el-sub-menu>
               </el-menu>
             </el-col>
