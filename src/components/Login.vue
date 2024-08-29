@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <el-form :model="form" ref="loginForm" label-width="120px" class="login-form">
+    <el-form :model="form" ref="loginForm" label-width="120px" class="login-form"  @submit.prevent="handleLogin">
       <h2 class="login-title">不逆云系统</h2>
       <el-form-item label="用户名" prop="username">
         <el-input v-model="form.username" placeholder="请输入用户名" class="login-input"/>
@@ -9,7 +9,7 @@
         <el-input type="password" show-password v-model="form.password" placeholder="请输入密码" class="login-input"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleLogin" class="login-button">登录</el-button>
+        <button type="submit" class="login-button">登录</button>
       </el-form-item>
     </el-form>
   </div>
@@ -102,10 +102,14 @@ body, html {
 }
 
 .login-button {
+  outline: none;
+  border: none;
+  border-radius: 5px;
   width: 100%;
   height: 40px;
   margin-top: 20px;
   margin-right: 50px;
+  background-color: #409EFF;
 }
 
 </style>

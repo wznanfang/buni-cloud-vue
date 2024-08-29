@@ -30,13 +30,13 @@
         @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" fixed width="45"/>
-      <el-table-column prop="name" label="名字" width="140" show-overflow-tooltip/>
-      <el-table-column prop="type" label="类型" width="90"/>
+      <el-table-column prop="name" label="名字" width="150" show-overflow-tooltip/>
+      <el-table-column prop="type" label="类型" width="120"/>
       <el-table-column prop="code" label="标识码" width="150"/>
-      <el-table-column prop="sort" label="序号" width="90"/>
-      <el-table-column prop="url" label="接口地址" width="190" show-overflow-tooltip/>
-      <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column label="操作" fixed="right" width="400">
+      <el-table-column prop="sort" label="序号" width="120"/>
+      <el-table-column prop="url" label="接口地址" width="270" show-overflow-tooltip/>
+      <el-table-column prop="createTime" label="创建时间" width="200"/>
+      <el-table-column label="操作" fixed="right" width="230">
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
