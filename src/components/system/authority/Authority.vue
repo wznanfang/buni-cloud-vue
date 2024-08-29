@@ -241,18 +241,23 @@ function fetchParentMenus() {
 function addParentChange(selectedValues) {
   addForm.parentId = selectedValues[selectedValues.length - 1];
 }
+
 function editParentChange(selectedValues) {
   editForm.parentId = selectedValues[selectedValues.length - 1];
 }
 
 //新增
 const showAddDialog = ref(false);
-
 function addRow() {
+  addForm.name = '';
+  addForm.code = '';
+  addForm.parentId = '';
+  addForm.type = '';
+  addForm.sort = '';
+  addForm.url = '';
   fetchParentMenus();
   showAddDialog.value = true;
 }
-
 const addForm = reactive({
   name: '',
   code: '',
@@ -262,9 +267,9 @@ const addForm = reactive({
   url: '',
 });
 
-async function addAuthority() {
+function addAuthority() {
   try {
-    await save(addForm);
+    save(addForm);
     showAddDialog.value = false;
     search();
   } catch (error) {
@@ -354,6 +359,7 @@ async function saveChanges() {
   }
 }
 
+// 修改
 function update(authority) {
   return axios.put(`${API_BASE_URL}/user/v1/authority`, authority, {
     headers: {
@@ -369,6 +375,7 @@ function update(authority) {
   });
 }
 
+//删除
 function deleted(row) {
   axios.delete(`${API_BASE_URL}/user/v1/authority/${row.id}`, {
     headers: {
