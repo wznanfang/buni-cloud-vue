@@ -17,8 +17,6 @@
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
       <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
-      <!--      <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
-      <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>-->
     </div>
     <el-table
         class="userTable"
@@ -43,6 +41,7 @@
           <div class="button-container">
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
             <el-button @click="deleted(scope.row)" :icon="Delete" type="danger"></el-button>
+            <el-button @click="findChildren(scope.row)" type="primary">详情</el-button>
           </div>
         </template>
       </el-table-column>
@@ -282,7 +281,7 @@ function save() {
 }
 
 
-//编辑
+//TODO 编辑 级联选择器无法回显数据问题待解决
 const showEditDialog = ref(false);
 const editForm = reactive({
   name: '',
@@ -378,6 +377,11 @@ function batchDelete() {
       ElMessage.error(result.message);
     }
   })
+}
+
+//todo 查询子集权限
+function findChildren(row) {
+
 }
 
 //根据id查询
