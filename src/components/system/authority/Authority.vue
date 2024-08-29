@@ -92,8 +92,8 @@
                   :props="cascaderProps"
                   placeholder="请选择"
                   @change="handleChange"
-                  clearable
                   :show-all-levels=false
+                  clearable
               ></el-cascader>
             </el-form-item>
           </el-col>
@@ -152,6 +152,7 @@
                   :props="cascaderProps"
                   placeholder="请选择"
                   @change="handleChange"
+                  :show-all-levels=false
                   clearable
               ></el-cascader>
             </el-form-item>
@@ -222,21 +223,24 @@ const cascaderProps = {
 
 //请求父级菜单
 function fetchParentMenus() {
-  axios.get(`${API_BASE_URL}/user/v1/findMenuTree`, {
+  return axios.get(`${API_BASE_URL}/user/v1/findMenuTree`, {
     headers: {
       'Authorization': token
     }
   }).then(response => {
     if (response.data.code === 200) {
       cascaderOptions.value = response.data.result;
+      return cascaderOptions.value;
     } else {
       ElMessage.error(response.data.message);
+      return [];
     }
   })
 }
 
 function handleChange(selectedValues) {
   addForm.parentId = selectedValues[selectedValues.length - 1];
+  editForm.parentId = selectedValues[selectedValues.length - 1];
 }
 
 //新增
@@ -283,7 +287,7 @@ function save() {
 }
 
 
-//TODO 编辑 级联选择器无法回显数据问题待解决
+//编辑
 const showEditDialog = ref(false);
 const editForm = reactive({
   name: '',
@@ -294,29 +298,52 @@ const editForm = reactive({
   url: '',
 });
 
+// 递归查找路径
+function findPathById(options, id) {
+  let path = [];
+  function search(options) {
+    for (const option of options) {
+      if (option.id === id.toString()) {
+        path = [option.id];
+        return true;
+      }
+      if (option.children) {
+        const found = search(option.children);
+        if (found) {
+          path = [option.id, ...path];
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  search(options);
+  return path;
+}
+
 // 显示编辑对话框
-async function editRow(row) {
-  await fetchParentMenus();
-  try {
-    const response = await findById(row.id);
+function editRow(row) {
+  fetchParentMenus().then(() => {
+    return findById(row.id);
+  }).then(response => {
     let type = response.data.result.type;
     editForm.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
     editForm.id = response.data.result.id;
     editForm.name = response.data.result.name;
     editForm.code = response.data.result.code;
-    editForm.parentId = response.data.result.parentId;
     editForm.sort = response.data.result.sort;
     editForm.url = response.data.result.url;
+    editForm.parentId = findPathById(cascaderOptions.value, response.data.result.parentId)[0];
     showEditDialog.value = true;
-  } catch (error) {
-    ElMessage.error('查询失败，请稍后再试');
-  }
+  })
+  console.log(editForm)
 }
 
 // 保存更改
 async function saveChanges() {
   try {
     editForm.type = editForm.type === '模块' ? 0 : editForm.type === '菜单' ? 1 : 2;
+    console.log(editForm);
     await update(editForm);
     showEditDialog.value = false;
     search();
