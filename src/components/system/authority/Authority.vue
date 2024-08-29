@@ -16,9 +16,9 @@
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
-      <!--      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
-            <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
-            <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>-->
+      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
+      <!--      <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
+      <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>-->
     </div>
     <el-table
         class="userTable"
@@ -94,7 +94,7 @@
                   placeholder="请选择"
                   @change="handleChange"
                   clearable
-                  :show-all-levels = false
+                  :show-all-levels=false
               ></el-cascader>
             </el-form-item>
           </el-col>
@@ -174,7 +174,7 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showEditDialog = false">取消</el-button>
-      <el-button type="primary" @click="addAuthority">保存</el-button>
+      <el-button type="primary" @click="saveChanges">保存</el-button>
     </span>
       </template>
     </el-dialog>
@@ -315,7 +315,8 @@ async function editRow(row) {
 // 保存更改
 async function saveChanges() {
   try {
-    // await update(editForm);
+    editForm.type = editForm.type === '模块' ? 0 : editForm.type === '菜单' ? 1 : 2;
+    await update(editForm);
     showEditDialog.value = false;
     search();
   } catch (error) {
@@ -336,6 +337,47 @@ function update(authority) {
       ElMessage.error(response.data.message);
     }
   });
+}
+
+function deleted(row) {
+  axios.delete(`${API_BASE_URL}/user/v1/authority/${row.id}`, {
+    headers: {
+      'Authorization': token
+    }
+  }).then(response => {
+    if (response.data.code === 200) {
+      ElMessage.success('删除成功');
+      search();
+    } else {
+      ElMessage.error(response.data.message);
+    }
+  })
+}
+
+//批量删除
+function batchDelete() {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请先选择数据');
+    return;
+  }
+  const ids = selectedRows.value.map(row => row.id);
+  axios.delete(`${API_BASE_URL}/user/v1/authority`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+    },
+    data: {ids}
+  }).then(response => {
+    const result = response.data;
+    if (result.code === 200) {
+      ElMessage.success('删除成功');
+      records.value = records.value.filter(item => !ids.includes(item.id));
+      selectedRows.value = [];
+      search();
+    } else {
+      ElMessage.error(result.message);
+    }
+  })
 }
 
 //根据id查询
