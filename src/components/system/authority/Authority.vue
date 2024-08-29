@@ -91,7 +91,7 @@
                   :options="cascaderOptions"
                   :props="cascaderProps"
                   placeholder="请选择"
-                  @change="handleChange"
+                  @change="addParentChange"
                   :show-all-levels=false
                   clearable
               ></el-cascader>
@@ -151,7 +151,7 @@
                   :options="cascaderOptions"
                   :props="cascaderProps"
                   placeholder="请选择"
-                  @change="handleChange"
+                  @change="editParentChange"
                   :show-all-levels=false
                   clearable
               ></el-cascader>
@@ -238,8 +238,10 @@ function fetchParentMenus() {
   })
 }
 
-function handleChange(selectedValues) {
+function addParentChange(selectedValues) {
   addForm.parentId = selectedValues[selectedValues.length - 1];
+}
+function editParentChange(selectedValues) {
   editForm.parentId = selectedValues[selectedValues.length - 1];
 }
 
