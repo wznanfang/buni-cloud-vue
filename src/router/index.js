@@ -4,6 +4,7 @@ import Home from '@/components/Home.vue';
 import User from '@/components/system/user/User.vue';
 import Authority from '@/components/system/authority/Authority.vue';
 import UserProfile from '@/components/system/user/UserProfile.vue';
+import AuthorityInfo from "@/components/system/authority/AuthorityInfo.vue";
 
 const routes = [
     {
@@ -37,6 +38,12 @@ const routes = [
         path: '/Authority',
         name: 'Authority',
         component: Authority,
+        meta: {requiresAuth: true},
+    },
+    {
+        path: '/AuthorityInfo',
+        name: 'AuthorityInfo',
+        component: AuthorityInfo,
         meta: {requiresAuth: true},
     }
 ];

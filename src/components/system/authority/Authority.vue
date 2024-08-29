@@ -189,7 +189,9 @@ import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
+import {useRouter} from 'vue-router';
 
+const router = useRouter();
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = 'bearer ' + tokenVO.token;
@@ -381,7 +383,7 @@ function batchDelete() {
 
 //todo 查询子集权限
 function findChildren(row) {
-
+  router.push('/AuthorityInfo')
 }
 
 //根据id查询
