@@ -84,13 +84,13 @@ import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'elem
 import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import axios from "axios";
-import {API_BASE_URL} from "@/config.js";
+import {API_BASE_URL, BEARER} from "@/config.js";
 import {logout, getUserInfo} from "@/baseConfig/auth.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = 'bearer ' + tokenVO.token;
+const token = BEARER + tokenVO.token;
 const store = useStore();
 const mySelfInfo = ref({});
 const avatarUrl = ref('');

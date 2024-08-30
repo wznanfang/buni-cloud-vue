@@ -185,7 +185,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {API_BASE_URL} from '@/config.js';
+import {API_BASE_URL,BEARER} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
@@ -195,7 +195,7 @@ import {useRouter} from 'vue-router';
 const router = useRouter();
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = 'bearer ' + tokenVO.token;
+const token = BEARER + tokenVO.token;
 const records = ref([]);
 const selectedRows = ref([]);
 const currentPage = ref(1); // 当前页

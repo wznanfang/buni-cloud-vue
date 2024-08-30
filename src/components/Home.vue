@@ -14,10 +14,10 @@ import CommonLayout from '@/components/base/CommonLayout.vue';
 import {onMounted, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from 'element-plus';
-import {API_BASE_URL} from "@/config.js";
+import {API_BASE_URL,BEARER} from "@/config.js";
 
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = 'bearer ' + tokenVO.token;
+const token = BEARER + tokenVO.token;
 
 // 在组件挂载时请求数据
 onMounted(() => {

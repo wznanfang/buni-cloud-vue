@@ -196,7 +196,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {API_BASE_URL} from '@/config.js';
+import {API_BASE_URL, BEARER} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
@@ -205,7 +205,7 @@ import {Encrypt} from '@/baseConfig/secret.js';
 
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = 'bearer ' + tokenVO.token;
+const token = BEARER + tokenVO.token;
 const records = ref([]);
 const selectedRows = ref([]);
 const usernameInput = ref('')
@@ -226,6 +226,7 @@ onMounted(() => {
 
 //新增
 const showAddDialog = ref(false);
+
 // 显示新增对话框
 function addRow() {
   addForm.username = '';
@@ -484,7 +485,7 @@ function enableStatus(row, enable) {
 
 //重置密码
 function resetPassword(row) {
-  axios.put(`${API_BASE_URL}/user/v1/user/resetPassword/${row.id}`, null,{
+  axios.put(`${API_BASE_URL}/user/v1/user/resetPassword/${row.id}`, null, {
     headers: {
       'Authorization': token
     }
