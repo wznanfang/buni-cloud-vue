@@ -51,7 +51,7 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 50, 100]"
+          :page-sizes="[10, 20, 30]"
           :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="totalRecords"
@@ -248,6 +248,7 @@ function editParentChange(selectedValues) {
 
 //新增
 const showAddDialog = ref(false);
+
 function addRow() {
   addForm.name = '';
   addForm.code = '';
@@ -258,6 +259,7 @@ function addRow() {
   fetchParentMenus();
   showAddDialog.value = true;
 }
+
 const addForm = reactive({
   name: '',
   code: '',
@@ -308,6 +310,7 @@ const editForm = reactive({
 // 递归查找路径
 function findPathById(options, id) {
   let path = [];
+
   function search(options) {
     for (const option of options) {
       if (option.id === id.toString()) {
@@ -324,6 +327,7 @@ function findPathById(options, id) {
     }
     return false;
   }
+
   search(options);
   return path;
 }

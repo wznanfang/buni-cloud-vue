@@ -23,6 +23,7 @@ export function logout(router) {
     })
 }
 
+//获取用户信息
 export function getUserInfo(id, token) {
     return axios.get(`${API_BASE_URL}/user/v1/user/${id}`, {
         headers: {

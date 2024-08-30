@@ -109,6 +109,7 @@ body, html {
   height: 40px;
   margin-top: 20px;
   margin-right: 50px;
+  color: white;
   background-color: #409EFF;
 }
 

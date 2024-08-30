@@ -54,20 +54,16 @@ const router = createRouter({
 });
 
 
-
 // 添加导航守卫,避免直接访问页面，未登录则跳转回登录页面
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
         const tokenVO = JSON.parse(localStorage.getItem('authToken'));
         const isAuthenticated = Boolean(tokenVO && typeof tokenVO === 'object' && Object.keys(tokenVO).length > 0);
-        if (isAuthenticated) {
-            next();
-        } else {
+        if (!isAuthenticated) {
             next('/Login');
         }
-    } else {
-        next();
     }
+    next();
 });
 
 export default router;
