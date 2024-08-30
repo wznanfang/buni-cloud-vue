@@ -99,6 +99,7 @@ onMounted(() => {
   myself()
 });
 
+//查询登录用户信息
 function myself() {
   getUserInfo(loginUser.id, token).then(result => {
     mySelfInfo.value = result;
@@ -117,6 +118,7 @@ function selectAvatar() {
   }
 }
 
+// 修改头像
 function changeAvatar(event) {
   const file = event.target.files[0]
   if (file) {
@@ -149,13 +151,14 @@ function editUserAvatar(avatar) {
   }).then(async response => {
     if (response.data.code === 200) {
       ElMessage.success('修改成功');
-      await myself()
+      myself()
     } else {
       ElMessage.error('修改失败');
     }
   })
 }
 
+// 保存修改
 function saveChanges() {
   mySelfInfo.value.sex = mySelfInfo.value.sex === '男' || mySelfInfo.value.sex === '1' ? 1 : 0;
   mySelfInfo.value.enable = mySelfInfo.value.enable === '启用' || mySelfInfo.value.enable === '1' ? 1 : 0;
@@ -179,6 +182,7 @@ const updatePassWordForm = reactive({
   newPassword: '',
 });
 
+// 修改密码
 function updatePassword() {
   axios.put(`${API_BASE_URL}/user/v1/user/password`, updatePassWordForm, {
     headers: {

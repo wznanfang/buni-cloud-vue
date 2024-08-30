@@ -505,6 +505,10 @@ function handleCurrentChange(val) {
   width: 200px;
 }
 
+.addButton, .batchDeleteButton {
+  height: 35px;
+}
+
 .userTable {
   width: 98%;
   margin-left: 20px;
