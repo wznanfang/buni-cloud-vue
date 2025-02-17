@@ -4,7 +4,7 @@
   </div>
   <div class="header-container">
     <el-dropdown>
-      <span class="el-dropdown-link">{{loginUser.name}}</span>
+      <span class="el-dropdown-link">{{ loginUser?.name }}</span>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
@@ -12,28 +12,28 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-avatar class="avatar" :src="loginUser.avatar"/>
+    <el-avatar class="avatar" :src="loginUser?.avatar"/>
   </div>
 </template>
 
 <script setup>
-import {useRouter} from 'vue-router';
-import {logout} from "@/baseConfig/auth.js";
-import {ref} from "vue";
+import { useRouter } from 'vue-router'
+import { logout } from '@/baseConfig/auth.js'
+import { useUserStore } from '@/utils/user'
+import { storeToRefs } from 'pinia'
 
-const router = useRouter();
-const loginUser = ref(JSON.parse(localStorage.getItem('loginUser')));
+const router = useRouter()
+const userStore = useUserStore()
+const { loginUser } = storeToRefs(userStore)
 
-function myself() {
+const myself = () => {
   router.push('/UserProfile')
 }
 
-function loginOut() {
-  logout(router);
+const loginOut = () => {
+  logout(router)
 }
-
 </script>
-
 
 <style scoped>
 .header-container {
@@ -51,9 +51,7 @@ function loginOut() {
   color: rgb(245, 245, 245);
 }
 
-
 .avatar {
   margin-left: 20px;
 }
-
 </style>

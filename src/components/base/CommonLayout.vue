@@ -1,32 +1,46 @@
 <template>
   <div class="common-layout">
     <el-container>
+      <!-- 头部导航 -->
       <el-header class="header">
         <Header />
       </el-header>
+
       <el-container class="content-container">
+        <!-- 侧边栏 -->
         <el-aside class="aside sidebar-container">
           <el-row class="tac">
             <el-col>
               <el-menu
                   class="el-menu-vertical-demo"
-                  :default-active=route.path
+                  :default-active="activeMenu"
                   :default-openeds="defaultOpeneds"
                   router
                   unique-opened
               >
-                <el-menu-item index="/Home">首页</el-menu-item>
-                <el-sub-menu index="system">
-                  <template #title>
-                    <span>系统设置</span>
-                  </template>
-                  <el-menu-item index="/User">用户管理</el-menu-item>
-                  <el-menu-item index="/Authority">权限管理</el-menu-item>
-                </el-sub-menu>
+                <template v-for="menu in menuList" :key="menu.index">
+                  <el-menu-item v-if="!menu.children" :index="menu.index">
+                    {{ menu.title }}
+                  </el-menu-item>
+                  <el-sub-menu v-else :index="menu.index">
+                    <template #title>
+                      <span>{{ menu.title }}</span>
+                    </template>
+                    <el-menu-item
+                        v-for="sub in menu.children"
+                        :key="sub.index"
+                        :index="sub.index"
+                    >
+                      {{ sub.title }}
+                    </el-menu-item>
+                  </el-sub-menu>
+                </template>
               </el-menu>
             </el-col>
           </el-row>
         </el-aside>
+
+        <!-- 主内容区域 -->
         <el-main class="el-main">
           <slot></slot>
         </el-main>
@@ -36,20 +50,34 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
-import {useRoute} from 'vue-router';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import Header from '@/components/base/Header.vue';
 
 const route = useRoute();
 
-// 计算需要展开的菜单项
-const defaultOpeneds = computed(() => {
-  if (route.path.includes('/User') || route.path.includes('/Authority')) {
-    return ['system'];
+/** 菜单配置 */
+const menuList = [
+  { index: '/Home', title: '首页' },
+  {
+    index: 'system',
+    title: '系统设置',
+    children: [
+      { index: '/User', title: '用户管理' },
+      { index: '/Authority', title: '权限管理' }
+    ]
   }
-  return [];
-});
+];
 
+/** 当前激活的菜单 */
+const activeMenu = computed(() => route.path);
+
+/** 计算需要展开的菜单 */
+const defaultOpeneds = computed(() => {
+  return menuList
+      .filter(menu => menu.children && menu.children.some(sub => sub.index === route.path))
+      .map(menu => menu.index);
+});
 </script>
 
 <style scoped>
