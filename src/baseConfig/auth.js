@@ -1,7 +1,6 @@
 import service from '@/utils/interceptors.js'
 import {useUserStore} from '@/utils/user'
 import {ElMessage} from 'element-plus'
-import {API_BASE_URL} from "@/config.js";
 
 
 export const AuthApi = {

@@ -41,10 +41,10 @@ async function handleLogin() {
   // 调用login方法并等待结果
   const response = await AuthApi.login(formData.value);
   console.log(response,'-----------------------------------')
-  if (response.data.code === 200) { // 假设响应结构中有一个code字段表示状态码
-    const authToken = response.data.result.tokenVO;
+  if (response.code === 200) {
+    const authToken = response.result.tokenVO;
     // 获取用户信息
-    const userInfoRes = AuthApi.getUserInfo(response.data.result.id);
+    const userInfoRes = AuthApi.getUserInfo(response.result.id);
     // 存储登录用户信息和token到localStorage
     localStorage.setItem('loginUser', JSON.stringify(userInfoRes));
     localStorage.setItem('authToken', JSON.stringify(authToken));
