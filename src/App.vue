@@ -2,18 +2,11 @@
   <router-view></router-view>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-import Login from '@/components/Login.vue';
+<script setup lang="ts">
 
-export default defineComponent({
-  components: {
-    Login
-  },
-});
 </script>
 
-<style>
+<style scoped>
 body{
   margin: 0;
 }

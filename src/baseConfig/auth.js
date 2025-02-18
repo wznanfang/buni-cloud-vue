@@ -1,4 +1,4 @@
-import service from '@/utils/request'
+import service from '@/utils/interceptors.js'
 import { useUserStore } from '@/utils/user'
 import { ElMessage } from 'element-plus'
 
