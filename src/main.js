@@ -4,7 +4,6 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'; // 导入中文语言包
 import router from './router';
-import interceptors from '@/utils/interceptors.js'; // 引入拦截器配置
 import { store } from './baseConfig/store.js';
 import * as echarts from "echarts";
 import ECharts from "vue-echarts";

@@ -33,7 +33,7 @@ service.interceptors.response.use(
             ElMessage.error(response.data.message || '请求失败')
             return Promise.reject(response.data)
         }
-        return response.data.result
+        return response.data
     },
     error => {
         console.error('请求错误:', error)
