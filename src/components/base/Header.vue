@@ -18,7 +18,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { logout } from '@/baseConfig/auth.js'
+import { AuthApi } from '@/baseConfig/auth.js'
 import { useUserStore } from '@/utils/user'
 import { storeToRefs } from 'pinia'
 
@@ -31,7 +31,7 @@ const myself = () => {
 }
 
 const loginOut = () => {
-  logout(router)
+  AuthApi.logout(router)
 }
 </script>
 

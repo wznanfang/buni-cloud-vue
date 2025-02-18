@@ -1,12 +1,14 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
 import {API_BASE_URL, BEARER} from '@/config.js'
-import router from "@/router/index.js";
 
 // 创建 Axios 实例
 const service = axios.create({
     baseURL: API_BASE_URL, // 设置 API 基础地址
-    timeout: 5000 // 请求超时时间
+    timeout: 5000, // 请求超时时间
+    headers: {
+        'Content-Type': 'application/json'
+    }
 })
 
 // 请求拦截器：自动携带 token

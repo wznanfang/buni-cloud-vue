@@ -85,7 +85,7 @@ import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import axios from "axios";
 import {API_BASE_URL, BEARER} from "@/config.js";
-import {logout, getUserInfo} from "@/baseConfig/auth.js";
+import {AuthApi} from "@/baseConfig/auth.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
@@ -101,7 +101,7 @@ onMounted(() => {
 
 //查询登录用户信息
 function myself() {
-  getUserInfo(loginUser.id, token).then(result => {
+  AuthApi.getUserInfo(loginUser.id, token).then(result => {
     mySelfInfo.value = result;
     mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
     mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';

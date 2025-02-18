@@ -6,12 +6,12 @@
           <span class="title">不逆云系统</span>
         </div>
       </template>
-      <el-form :model="form" ref="loginForm" label-width="auto" @submit.prevent="handleLogin" class="login-form">
+      <el-form :model="formData" ref="loginForm" label-width="auto" @submit.prevent="handleLogin" class="login-form">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名"/>
+          <el-input v-model="formData.username" placeholder="请输入用户名"/>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" show-password v-model="form.password" placeholder="请输入密码"/>
+          <el-input type="password" show-password v-model="formData.password" placeholder="请输入密码"/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" native-type="submit" class="login-button">登录</el-button>
@@ -25,44 +25,34 @@
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
-import axios from 'axios';
-import {API_BASE_URL} from '../config.js';
-import {Encrypt} from '../baseConfig/secret.js';
-import {getUserInfo} from "@/baseConfig/auth.js";
+import {AuthApi} from "@/baseConfig/auth.js";
+import {Encrypt} from "@/baseConfig/secret.js";
 
 const router = useRouter();
 
-const form = ref({
+const formData = ref({
   username: '',
   password: ''
 });
 
-function handleLogin() {
-  let password = Encrypt(form.value.password)
-  const body = {
-    username: form.value.username,
-    password: password
+async function handleLogin() {
+  let password = formData.value.password
+  formData.value.password = Encrypt(password);
+  // 调用login方法并等待结果
+  const response = await AuthApi.login(formData.value);
+  console.log(response,'-----------------------------------')
+  if (response.data.code === 200) { // 假设响应结构中有一个code字段表示状态码
+    const authToken = response.data.result.tokenVO;
+    // 获取用户信息
+    const userInfoRes = AuthApi.getUserInfo(response.data.result.id);
+    // 存储登录用户信息和token到localStorage
+    localStorage.setItem('loginUser', JSON.stringify(userInfoRes));
+    localStorage.setItem('authToken', JSON.stringify(authToken));
+    ElMessage.success('登录成功');
+    await router.push({name: 'Home'});
+  } else {
+    ElMessage.error(response.data.message || "未知错误");
   }
-  axios.post(`${API_BASE_URL}/user/v1/login`, body, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then(async response => {
-    if (response.data.code === 200) {
-      const authToken = response.data.result.tokenVO;
-      await getUserInfo(response.data.result.id, authToken.token).then(res => {
-        localStorage.setItem('loginUser', JSON.stringify(res));
-        console.log(res);
-      }).catch(err => {
-        ElMessage.error("登录失败");
-      })
-      localStorage.setItem('authToken', JSON.stringify(authToken));
-      ElMessage.success('登录成功');
-      router.push({name: 'Home'});
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
 }
 </script>
 
