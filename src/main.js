@@ -30,8 +30,6 @@ app.use(ElementPlus, {
     }
 });
 
-interceptors();
-
 app.use(router,store,echarts);
 app.use(store);
 app.use(echarts);
