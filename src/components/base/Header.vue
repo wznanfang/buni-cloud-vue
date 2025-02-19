@@ -19,7 +19,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { AuthApi } from '@/baseConfig/system/auth.js'
-import { useUserStore } from '@/utils/user'
+import { useUserStore } from '@/utils/userStore.js'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()

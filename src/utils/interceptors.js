@@ -37,7 +37,7 @@ service.interceptors.response.use(
     },
     error => {
         console.error('请求错误:', error)
-        ElMessage.error('网络错误，请稍后重试')
+        ElMessage.error('服务器错误，请稍后重试')
         return Promise.reject(error)
     }
 )

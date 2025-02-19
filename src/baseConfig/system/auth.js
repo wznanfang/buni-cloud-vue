@@ -1,5 +1,5 @@
 import service from '@/utils/interceptors.js'
-import {useUserStore} from '@/utils/user.js'
+import {useUserStore} from '@/utils/userStore.js'
 import {ElMessage} from 'element-plus'
 
 
