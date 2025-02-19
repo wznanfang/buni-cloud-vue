@@ -4,9 +4,10 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'; // 导入中文语言包
 import router from './router';
-import { store } from './baseConfig/store.js';
+import { store } from './utils/store.js';
 import * as echarts from "echarts";
 import ECharts from "vue-echarts";
+import { createPinia } from 'pinia'
 
 const app = createApp(App)
 
@@ -28,7 +29,7 @@ app.use(ElementPlus, {
         return value;
     }
 });
-
+app.use(createPinia())
 app.use(router,store,echarts);
 app.use(store);
 app.use(echarts);

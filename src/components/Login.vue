@@ -26,7 +26,7 @@ import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
 import {AuthApi} from "@/baseConfig/auth.js";
-import {Encrypt} from "@/baseConfig/secret.js";
+import {Encrypt} from "@/utils/secret.js";
 
 const router = useRouter();
 

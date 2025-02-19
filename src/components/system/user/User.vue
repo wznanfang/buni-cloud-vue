@@ -201,7 +201,7 @@ import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
-import {Encrypt} from '@/baseConfig/secret.js';
+import {Encrypt} from '@/utils/secret.js';
 
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
