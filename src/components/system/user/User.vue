@@ -185,12 +185,12 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {API_BASE_URL, BEARER} from '@/config.js';
-import {onMounted, reactive, ref} from 'vue';
-import axios from 'axios';
+import {BEARER} from '@/config.js';
+import {onMounted, ref} from 'vue';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
+import {UserApi} from "@/baseConfig/system/user.js"
 
 //变量
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
@@ -228,7 +228,7 @@ function addRow() {
   showAddDialog.value = true;
 }
 
-const addForm = reactive({
+const addForm = ref({
   username: '',
   password: '',
   name: '',
@@ -241,7 +241,12 @@ const addForm = reactive({
 async function addUser() {
   try {
     addForm.password = Encrypt(addForm.password);
-    await save(addForm);
+    const response = await UserApi.save(addForm)
+    if (response.code === 200) {
+      ElMessage.success('添加成功');
+    } else {
+      ElMessage.error(response.message);
+    }
     showAddDialog.value = false;
     search();
   } catch (error) {
@@ -249,24 +254,9 @@ async function addUser() {
   }
 }
 
-function save() {
-  return axios.post(`${API_BASE_URL}/user/v1/user`, addForm, {
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('添加成功');
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
-}
-
 //编辑
 const dialogVisible = ref(false);
-const editForm = reactive({
+const editForm = ref({
   username: '',
   name: '',
   age: '',
@@ -294,13 +284,18 @@ async function editRow(row) {
   }
 }
 
-// 保存更改
+// 更改
 async function saveChanges() {
   try {
     editForm.sex = editForm.sex === '男' || editForm.sex === '1' ? 1 : 0;
     editForm.enable = editForm.enable === '启用' || editForm.enable === '1' ? 1 : 0;
     editForm.admin = editForm.admin === '是' || editForm.admin === '1' ? 1 : 0;
-    await update(editForm);
+    const response = await UserApi.update(editForm)
+    if (response.code === 200) {
+      ElMessage.success('修改成功');
+    } else {
+      ElMessage.error(response.message);
+    }
     dialogVisible.value = false;
     search();
   } catch (error) {
@@ -308,66 +303,62 @@ async function saveChanges() {
   }
 }
 
-function update(user) {
-  return axios.put(`${API_BASE_URL}/user/v1/user`, user, {
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('修改成功');
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  });
+//删除
+async function deleted(row) {
+  const response = await UserApi.delete(row.id)
+  if (response.code === 200) {
+    ElMessage.success('删除成功');
+    search();
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
-//删除
-function deleted(row) {
-  axios.delete(`${API_BASE_URL}/user/v1/user/${row.id}`, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      ElMessage.success('删除成功');
-      search();
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
+// 启用-禁用
+async function enableStatus(row, enable) {
+  const data = {
+    id: row.id,
+    enable: enable ? 1 : 0
+  };
+  const response = await UserApi.enableStatus(data)
+  if (response.code === 200) {
+    ElMessage.success('操作成功');
+    search();
+  } else {
+    ElMessage.error(response.message);
+  }
+}
+
+//重置密码
+async function resetPassword(row) {
+  const response = await UserApi.resetPassword(row.id)
+  if (response.code === 200) {
+    ElMessage.success('重置成功');
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 //批量删除
-function batchDelete() {
+async function batchDelete() {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择数据');
     return;
   }
   const ids = selectedRows.value.map(row => row.id);
-  axios.delete(`${API_BASE_URL}/user/v1/user/batchDelete`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token
-    },
-    data: {ids}
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      ElMessage.success('删除成功');
-      records.value = records.value.filter(item => !ids.includes(item.id));
-      selectedRows.value = [];
-      search();
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
+  const response = await UserApi.batchDelete(ids)
+  if (response.code === 200) {
+    ElMessage.success('删除成功');
+    records.value = records.value.filter(item => !ids.includes(item.id));
+    selectedRows.value = [];
+    search();
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 //批量启用-禁用
-function batchEnable(enable) {
+async function batchEnable(enable) {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择数据');
     return;
@@ -377,65 +368,47 @@ function batchEnable(enable) {
     idVOs: {ids},
     enable: enable ? 1 : 0
   };
-  axios.put(`${API_BASE_URL}/user/v1/user/batchEnable`, data, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token
-    },
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('操作成功');
-      records.value = records.value.filter(item => !ids.includes(item.id));
-      selectedRows.value = [];
-      search();
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
+  const response = await UserApi.batchEnable(data)
+  if (response.code === 200) {
+    ElMessage.success('操作成功');
+    records.value = records.value.filter(item => !ids.includes(item.id));
+    selectedRows.value = [];
+    search();
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
-
 //根据id查询
-function findById(id) {
-  return axios.get(`${API_BASE_URL}/user/v1/user/${id}`, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      return response;
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
+async function findById(id) {
+  const response = await UserApi.getUserInfo(id)
+  if (response.code === 200) {
+    return response;
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 //分页查询
-function search() {
-  axios.get(`${API_BASE_URL}/user/v1/user`, {
-    headers: {
-      'Authorization': token
-    },
-    params: {
-      username: usernameInput.value,
-      name: nameInput.value,
-      current: currentPage.value,
-      size: pageSize.value
-    }
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      records.value = result.result.records;
-      totalRecords.value = result.result.total;
-      records.value.forEach(item => {
-        item.sex = item.sex === 1 ? '男' : '女';
-        item.enable = item.enable === 1 ? '启用' : '禁用';
-        item.admin = item.admin === 1 ? '是' : '否';
-      })
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
+async function search() {
+  const params = {
+    username: usernameInput.value,
+    name: nameInput.value,
+    current: currentPage.value,
+    size: pageSize.value
+  };
+  const response = await UserApi.getPage(params)
+  if (response.code === 200) {
+    records.value = response.result.records;
+    totalRecords.value = response.result.total;
+    records.value.forEach(item => {
+      item.sex = item.sex === 1 ? '男' : '女';
+      item.enable = item.enable === 1 ? '启用' : '禁用';
+      item.admin = item.admin === 1 ? '是' : '否';
+    })
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 // 分页大小改变时
@@ -449,44 +422,6 @@ function handleCurrentChange(val) {
   currentPage.value = val;
   search();
 }
-
-// 启用禁用
-function enableStatus(row, enable) {
-  const data = {
-    id: row.id,
-    enable: enable ? 1 : 0
-  };
-  axios.put(`${API_BASE_URL}/user/v1/user/forbidden`, data, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token
-    }
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      ElMessage.success('操作成功');
-      search();
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
-}
-
-//重置密码
-function resetPassword(row) {
-  axios.put(`${API_BASE_URL}/user/v1/user/resetPassword/${row.id}`, null, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('重置成功');
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
-}
-
 
 </script>
 
@@ -502,10 +437,6 @@ function resetPassword(row) {
   display: flex;
   margin: 30px 0 20px 20px;
   align-items: center;
-}
-
-.flex-grow {
-  flex-grow: 1;
 }
 
 .searchInput {

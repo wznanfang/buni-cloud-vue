@@ -1,5 +1,5 @@
 import service from '@/utils/interceptors.js'
-import {useUserStore} from '@/utils/user'
+import {useUserStore} from '@/utils/user.js'
 import {ElMessage} from 'element-plus'
 
 
@@ -19,14 +19,6 @@ export const AuthApi = {
             router.push({name: 'Login'})
         });
     },
-
-    // 获取用户信息
-    getUserInfo: async (id) => {
-        const userStore = useUserStore()
-        return service.get(`/user/v1/user/${id}`).then((res) => {
-            userStore.setUser(res)
-        });
-    }
 
 
 }

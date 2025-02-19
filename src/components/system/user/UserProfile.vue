@@ -85,7 +85,7 @@ import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import axios from "axios";
 import {API_BASE_URL, BEARER} from "@/config.js";
-import {AuthApi} from "@/baseConfig/auth.js";
+import {AuthApi} from "@/baseConfig/system/auth.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));

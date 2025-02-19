@@ -25,7 +25,8 @@
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {ElMessage} from 'element-plus';
-import {AuthApi} from "@/baseConfig/auth.js";
+import {AuthApi} from "@/baseConfig/system/auth.js";
+import {UserApi} from "@/baseConfig/system/user.js";
 import {Encrypt} from "@/utils/secret.js";
 
 const router = useRouter();
@@ -38,13 +39,11 @@ const formData = ref({
 async function handleLogin() {
   let password = formData.value.password
   formData.value.password = Encrypt(password);
-  // 调用login方法并等待结果
   const response = await AuthApi.login(formData.value);
-  console.log(response,'-----------------------------------')
   if (response.code === 200) {
     const authToken = response.result.tokenVO;
     // 获取用户信息
-    const userInfoRes = AuthApi.getUserInfo(response.result.id);
+    const userInfoRes = UserApi.getUserInfo(response.result.id);
     // 存储登录用户信息和token到localStorage
     localStorage.setItem('loginUser', JSON.stringify(userInfoRes));
     localStorage.setItem('authToken', JSON.stringify(authToken));
