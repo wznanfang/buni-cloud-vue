@@ -5,26 +5,15 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
-      <el-input
-          v-model="usernameInput"
-          clearable
-          class="usernameInput"
-          placeholder="用户名"
-      />
-      <el-input
-          v-model="nameInput"
-          clearable
-          class="nameInput"
-          placeholder="姓名"
-      />
-      <div class="flex-grow"></div>
-      <el-button @click="search" class="searchButton" type="primary">查询</el-button>
+      <el-input v-model="usernameInput" clearable class="searchInput" placeholder="用户名"/>
+      <el-input v-model="nameInput" clearable class="searchInput" placeholder="姓名"/>
+      <el-button @click="search" class="searchButton" type="primary" plain>查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
-      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
-      <el-button @click="batchEnable(true)" class="batchEnableButton" type="warning">批量启用</el-button>
-      <el-button @click="batchEnable(false)" class="batchForbiddenButton" type="warning">批量禁用</el-button>
+      <el-button @click="addRow" type="primary" plain>新增</el-button>
+      <el-button @click="batchEnable(true)" type="warning" plain>启用</el-button>
+      <el-button @click="batchEnable(false)" type="warning" plain>禁用</el-button>
+      <el-button @click="batchDelete" type="danger" plain>删除</el-button>
     </div>
     <el-table
         class="userTable"
@@ -519,20 +508,9 @@ function resetPassword(row) {
   flex-grow: 1;
 }
 
-.usernameInput, .nameInput, .searchButton {
-  height: 35px;
-}
-
-.usernameInput, .nameInput {
+.searchInput {
   width: 200px;
-}
-
-.nameInput {
-  margin-left: 20px;
-}
-
-.addButton, .batchDeleteButton, .batchEnableButton, .batchForbiddenButton {
-  height: 35px;
+  margin-right: 20px;
 }
 
 .userTable {

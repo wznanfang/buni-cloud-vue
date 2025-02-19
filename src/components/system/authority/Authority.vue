@@ -5,18 +5,12 @@
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
-      <el-input
-          v-model="nameInput"
-          clearable
-          class="nameInput"
-          placeholder="名字"
-      />
-      <div class="flex-grow"></div>
-      <el-button @click="search" class="searchButton" type="primary">查询</el-button>
+      <el-input v-model="nameInput" clearable class="searchInput" placeholder="名字"/>
+      <el-button @click="search" class="searchButton" type="primary" plain>查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" class="addButton" type="primary">新增</el-button>
-      <el-button @click="batchDelete" class="batchDeleteButton" type="danger">批量删除</el-button>
+      <el-button @click="addRow" type="primary" plain>新增</el-button>
+      <el-button @click="batchDelete" type="danger" plain>删除</el-button>
     </div>
     <el-table
         class="userTable"
@@ -493,20 +487,9 @@ function handleCurrentChange(val) {
   align-items: center;
 }
 
-.flex-grow {
-  flex-grow: 1;
-}
-
-.nameInput, .searchButton {
-  height: 35px;
-}
-
-.nameInput {
+.searchInput {
   width: 200px;
-}
-
-.addButton, .batchDeleteButton {
-  height: 35px;
+  margin-right: 20px;
 }
 
 .userTable {
