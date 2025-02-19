@@ -185,7 +185,6 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {BEARER} from '@/config.js';
 import {onMounted, ref} from 'vue';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
@@ -193,8 +192,6 @@ import {Encrypt} from '@/utils/secret.js';
 import {UserApi} from "@/baseConfig/system/user.js"
 
 //变量
-const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = BEARER + tokenVO.token;
 const records = ref([]);
 const selectedRows = ref([]);
 const usernameInput = ref('')

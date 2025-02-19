@@ -1,50 +1,52 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <!-- 头部导航 -->
-      <el-header class="header">
-        <Header />
-      </el-header>
+      <div class="content">
+        <!-- 头部导航 -->
+        <el-header class="header">
+          <Header />
+        </el-header>
 
-      <el-container class="content-container">
-        <!-- 侧边栏 -->
-        <el-aside class="aside sidebar-container">
-          <el-row class="tac">
-            <el-col>
-              <el-menu
-                  class="el-menu-vertical-demo"
-                  :default-active="activeMenu"
-                  :default-openeds="defaultOpeneds"
-                  router
-                  unique-opened
-              >
-                <template v-for="menu in menuList" :key="menu.index">
-                  <el-menu-item v-if="!menu.children" :index="menu.index">
-                    {{ menu.title }}
-                  </el-menu-item>
-                  <el-sub-menu v-else :index="menu.index">
-                    <template #title>
-                      <span>{{ menu.title }}</span>
-                    </template>
-                    <el-menu-item
-                        v-for="sub in menu.children"
-                        :key="sub.index"
-                        :index="sub.index"
-                    >
-                      {{ sub.title }}
+        <el-container>
+          <!-- 侧边栏 -->
+          <el-aside class="aside">
+            <el-row class="tac">
+              <el-col>
+                <el-menu
+                    class="el-menu-vertical-demo"
+                    :default-active="activeMenu"
+                    :default-openeds="defaultOpeneds"
+                    router
+                    unique-opened
+                >
+                  <template v-for="menu in menuList" :key="menu.index">
+                    <el-menu-item v-if="!menu.children" :index="menu.index">
+                      {{ menu.title }}
                     </el-menu-item>
-                  </el-sub-menu>
-                </template>
-              </el-menu>
-            </el-col>
-          </el-row>
-        </el-aside>
+                    <el-sub-menu v-else :index="menu.index">
+                      <template #title>
+                        <span>{{ menu.title }}</span>
+                      </template>
+                      <el-menu-item
+                          v-for="sub in menu.children"
+                          :key="sub.index"
+                          :index="sub.index"
+                      >
+                        {{ sub.title }}
+                      </el-menu-item>
+                    </el-sub-menu>
+                  </template>
+                </el-menu>
+              </el-col>
+            </el-row>
+          </el-aside>
 
-        <!-- 主内容区域 -->
-        <el-main class="el-main">
-          <slot></slot>
-        </el-main>
-      </el-container>
+          <!-- 主内容区域 -->
+          <el-main class="el-main">
+            <slot></slot>
+          </el-main>
+        </el-container>
+      </div>
     </el-container>
   </div>
 </template>
@@ -86,44 +88,42 @@ const defaultOpeneds = computed(() => {
   margin: 0;
   height: 100vh;
   display: flex;
-  background-color: rgba(245, 245, 245, 0.93);
+  background-color: #F5F5F5ED;
+}
+
+.content {
+  width: 80%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #ffffff;
 }
 
 .header {
   height: 60px;
-  margin: 0 200px;
   border-radius: 5px;
   background-color: rgba(30, 39, 50);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: white;
+  color: #ffffff;
   font-size: 20px;
   border: none;
   box-shadow: none;
 }
 
 .aside {
-  margin: 0 0 0 200px;
   width: 200px;
-  background-color: rgb(245, 245, 245);
   height: 100%;
   overflow: hidden;
 }
 
 .el-main {
-  padding: 0;
-  margin: 0 200px 0 0;
+  padding: 0 20px 20px 0;
+  margin: 15px;
   height: 100%;
+  background-color: #F5F5F5ED;
+  border-radius: 5px;
 }
 
-.content-container {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.sidebar-container {
-  flex-shrink: 0;
-}
 </style>

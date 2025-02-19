@@ -17,21 +17,21 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { AuthApi } from '@/baseConfig/system/auth.js'
-import { useUserStore } from '@/utils/userStore.js'
-import { storeToRefs } from 'pinia'
+import {useRouter} from 'vue-router'
+import {AuthApi} from '@/baseConfig/system/auth.js'
+import {useUserStore} from '@/utils/userStore.js'
+import {storeToRefs} from 'pinia'
 
 const router = useRouter()
 const userStore = useUserStore()
-const { loginUser } = storeToRefs(userStore)
+const {loginUser} = storeToRefs(userStore)
 
-const myself = () => {
+function myself() {
   router.push('/UserProfile')
 }
 
-const loginOut = () => {
-  AuthApi.logout(router)
+async function loginOut() {
+  await AuthApi.logout(router)
 }
 </script>
 
