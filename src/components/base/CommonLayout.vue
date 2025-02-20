@@ -4,7 +4,7 @@
       <div class="content">
         <!-- 头部导航 -->
         <el-header class="header">
-          <Header />
+          <Header/>
         </el-header>
 
         <el-container>
@@ -52,21 +52,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import {computed} from 'vue';
+import {useRoute} from 'vue-router';
 import Header from '@/components/base/Header.vue';
 
 const route = useRoute();
 
-/** 菜单配置 */
+/** 菜单配置
+ * 暂时手动配置，后期通过接口获取菜单，动态配置
+ *
+ * */
 const menuList = [
-  { index: '/Home', title: '首页' },
+  {index: '/Home', title: '首页'},
   {
     index: 'system',
     title: '系统设置',
     children: [
-      { index: '/User', title: '用户管理' },
-      { index: '/Authority', title: '权限管理' }
+      {index: '/User', title: '用户管理'},
+      {index: '/Authority', title: '权限管理'}
     ]
   }
 ];

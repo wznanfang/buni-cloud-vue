@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import {defineStore} from 'pinia'
 import {AUTH_TOKEN, LOGIN_USER} from "@/config.js";
 
 export const useUserStore = defineStore('user', {

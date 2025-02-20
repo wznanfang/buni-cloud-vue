@@ -179,7 +179,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {API_BASE_URL,BEARER} from '@/config.js';
+import {API_BASE_URL, BEARER} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
 import {ElMessage} from "element-plus";
