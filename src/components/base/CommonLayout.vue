@@ -124,7 +124,7 @@ const defaultOpeneds = computed(() => {
 .el-main {
   padding: 0 20px 20px 0;
   margin: 15px;
-  height: 100%;
+  height: 100vh;
   background-color: #F5F5F5ED;
   border-radius: 5px;
 }
