@@ -8,10 +8,10 @@
       </template>
       <el-form :model="formData" ref="loginForm" label-width="auto" @submit.prevent="handleLogin" class="login-form">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="formData.username" placeholder="请输入用户名"/>
+          <el-input v-model="formData.username" clearable placeholder="请输入用户名"/>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" show-password v-model="formData.password" placeholder="请输入密码"/>
+          <el-input type="password" show-password v-model="formData.password" clearable placeholder="请输入密码"/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" native-type="submit" class="login-button">登录</el-button>
@@ -28,6 +28,7 @@ import {ElMessage} from 'element-plus';
 import {AuthApi} from "@/baseConfig/system/auth.js";
 import {UserApi} from "@/baseConfig/system/user.js";
 import {Encrypt} from "@/utils/secret.js";
+import {useUserStore} from "@/utils/userStore.js";
 
 const router = useRouter();
 
@@ -37,16 +38,14 @@ const formData = ref({
 });
 
 async function handleLogin() {
-  let password = formData.value.password
-  formData.value.password = Encrypt(password);
+  formData.value.password = Encrypt(formData.value.password);
   const response = await AuthApi.login(formData.value);
   if (response.code === 200) {
-    const authToken = response.result.tokenVO;
+    const userStore = useUserStore()
+    userStore.setToken(response.result.tokenVO)
     // 获取用户信息
-    const userInfoRes = UserApi.getUserInfo(response.result.id);
-    // 存储登录用户信息和token到localStorage
-    localStorage.setItem('loginUser', JSON.stringify(userInfoRes));
-    localStorage.setItem('authToken', JSON.stringify(authToken));
+    const userInfoRes = await UserApi.getUserInfo(response.result.id);
+    userStore.setUser(userInfoRes)
     ElMessage.success('登录成功');
     await router.push({name: 'Home'});
   } else {
@@ -61,10 +60,8 @@ async function handleLogin() {
   display: flex;
   justify-content: flex-end; /* 将内容对齐到右侧 */
   align-items: center; /* 垂直居中 */
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  background-image: url('/login/login_bg.jpg');
+  height: 100%;
+  background-image: url('/login/login_bg_2.webp');
   background-size: cover;
   background-position: center;
 }

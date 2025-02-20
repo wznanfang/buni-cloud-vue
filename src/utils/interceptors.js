@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
-import {API_BASE_URL, BEARER} from '@/config.js'
+import {API_BASE_URL, BEARER,LOGIN_USER,AUTH_TOKEN} from '@/config.js'
 
 // 创建 Axios 实例
 const service = axios.create({
@@ -14,11 +14,12 @@ const service = axios.create({
 // 请求拦截器：自动携带 token
 service.interceptors.request.use(
     config => {
-        const tokenVO = localStorage.getItem('authToken')
+        const tokenVO = localStorage.getItem(AUTH_TOKEN)
         if (tokenVO) {
             const token = JSON.parse(tokenVO).token
             config.headers.Authorization = `${BEARER}${token}`
         }
+        console.log('请求拦截器：', config)
         return config
     },
     error => {

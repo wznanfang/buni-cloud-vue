@@ -1,5 +1,4 @@
 import service from '@/utils/interceptors.js'
-import {useUserStore} from "@/utils/userStore.js";
 
 export const UserApi = {
 
@@ -40,17 +39,13 @@ export const UserApi = {
 
     // 获取用户信息
     getUserInfo: async (id) => {
-        const userStore = useUserStore()
-        return service.get({url: `/user/v1/user/` + id}).then((res) => {
-            userStore.setUser(res)
-        });
+        return await service.get(`/user/v1/user/${id}`)
     },
 
     // 分页查询
     getPage: async (params) => {
         return await service.get({url: `/user/v1/user`, params})
     },
-
 
 
 }
