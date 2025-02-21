@@ -5,6 +5,7 @@ import User from '@/components/system/user/User.vue';
 import Authority from '@/components/system/authority/Authority.vue';
 import UserProfile from '@/components/system/user/UserProfile.vue';
 import AuthorityInfo from "@/components/system/authority/AuthorityInfo.vue";
+import {AUTH_TOKEN} from "@/config.js";
 
 const routes = [
     {
@@ -57,7 +58,7 @@ const router = createRouter({
 // 添加导航守卫,避免直接访问页面，未登录则跳转回登录页面
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        const tokenVO = JSON.parse(localStorage.getItem('authToken'));
+        const tokenVO = JSON.parse(localStorage.getItem(AUTH_TOKEN));
         const isAuthenticated = tokenVO && typeof tokenVO === 'object' && Object.keys(tokenVO).length > 0;
         return isAuthenticated ? next() : next('/Login');
     }

@@ -6,7 +6,7 @@
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
       <el-input v-model="nameInput" clearable class="searchInput" placeholder="名字"/>
-      <el-button @click="search" class="searchButton" type="primary" plain>查询</el-button>
+      <el-button @click="pageList" class="searchButton" type="primary" plain>查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary" plain>新增</el-button>
@@ -40,18 +40,14 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="pagination-container">
-      <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="totalRecords"
-      >
-      </el-pagination>
-    </div>
+
+
+    <PaginationComponent
+        :currentPage.sync="currentPage"
+        :pageSize.sync="pageSize"
+        :totalRecords="totalRecords"
+        @change="pageList"
+    />
 
     <!-- 新增对话框 -->
     <el-dialog v-model="showAddDialog" title="新增权限" width="35%">
@@ -179,12 +175,13 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {API_BASE_URL, BEARER} from '@/config.js';
+import {BEARER} from '@/config.js';
 import {onMounted, reactive, ref} from 'vue';
-import axios from 'axios';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router';
+import PaginationComponent from "@/components/util/PageComponent.vue";
+import {AuthorityApi} from "@/baseConfig/system/authority.js";
 
 const router = useRouter();
 //变量
@@ -204,7 +201,7 @@ function handleSelectionChange(selected) {
 
 //默认请求
 onMounted(() => {
-  search();
+  pageList();
 });
 
 const cascaderOptions = ref([]);
@@ -216,20 +213,15 @@ const cascaderProps = {
 };
 
 //请求父级菜单
-function fetchParentMenus() {
-  return axios.get(`${API_BASE_URL}/user/v1/findMenuTree`, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      cascaderOptions.value = response.data.result;
-      return cascaderOptions.value;
-    } else {
-      ElMessage.error(response.data.message);
-      return [];
-    }
-  })
+async function fetchParentMenus() {
+  const response = await AuthorityApi.findParent();
+  if (response.code === 200) {
+    cascaderOptions.value = response.result;
+    return cascaderOptions.value;
+  } else {
+    ElMessage.error(response.message);
+    return [];
+  }
 }
 
 function addParentChange(selectedValues) {
@@ -263,30 +255,19 @@ const addForm = reactive({
   url: '',
 });
 
-function addAuthority() {
+async function addAuthority() {
   try {
-    save(addForm);
+    const response = await AuthorityApi.save(addForm)
+    if (response.code === 200) {
+      ElMessage.success('添加成功');
+    } else {
+      ElMessage.error(response.message);
+    }
     showAddDialog.value = false;
-    search();
+    pageList();
   } catch (error) {
     console.error(error);
   }
-}
-
-//新增权限
-function save() {
-  return axios.post(`${API_BASE_URL}/user/v1/authority`, addForm, {
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('添加成功');
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
 }
 
 
@@ -305,14 +286,14 @@ const editForm = reactive({
 function findPathById(options, id) {
   let path = [];
 
-  function search(options) {
+  function pageList(options) {
     for (const option of options) {
       if (option.id === id.toString()) {
         path = [option.id];
         return true;
       }
       if (option.children) {
-        const found = search(option.children);
+        const found = pageList(option.children);
         if (found) {
           path = [option.id, ...path];
           return true;
@@ -322,7 +303,7 @@ function findPathById(options, id) {
     return false;
   }
 
-  search(options);
+  pageList(options);
   return path;
 }
 
@@ -349,70 +330,47 @@ async function saveChanges() {
   try {
     editForm.type = editForm.type === '模块' ? 0 : editForm.type === '菜单' ? 1 : 2;
     console.log(editForm);
-    await update(editForm);
+    const response = await AuthorityApi.update(editForm);
+    if (response.code === 200) {
+      ElMessage.success('修改成功');
+    } else {
+      ElMessage.error(response.message);
+    }
     showEditDialog.value = false;
-    search();
+    pageList();
   } catch (error) {
     console.error(error);
   }
 }
 
-// 修改
-function update(authority) {
-  return axios.put(`${API_BASE_URL}/user/v1/authority`, authority, {
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('修改成功');
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  });
-}
-
 //删除
-function deleted(row) {
-  axios.delete(`${API_BASE_URL}/user/v1/authority/${row.id}`, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('删除成功');
-      search();
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
+async function deleted(row) {
+  let response = await AuthorityApi.delete(row.id);
+  if (response.code === 200) {
+    ElMessage.success('删除成功');
+    pageList();
+  } else {
+    ElMessage.error(response.message);
+  }
+
 }
 
 //批量删除
-function batchDelete() {
+async function batchDelete() {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择数据');
     return;
   }
   const ids = selectedRows.value.map(row => row.id);
-  axios.delete(`${API_BASE_URL}/user/v1/authority`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token
-    },
-    data: {ids}
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      ElMessage.success('删除成功');
-      records.value = records.value.filter(item => !ids.includes(item.id));
-      selectedRows.value = [];
-      search();
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
+  const response = await AuthorityApi.batchDelete(ids)
+  if (response.code === 200) {
+    ElMessage.success('删除成功');
+    records.value = records.value.filter(item => !ids.includes(item.id));
+    selectedRows.value = [];
+    pageList();
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 //todo 查询子集权限
@@ -421,55 +379,34 @@ function findChildren(row) {
 }
 
 //根据id查询
-function findById(id) {
-  return axios.get(`${API_BASE_URL}/user/v1/authority/${id}`, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      return response;
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
+async function findById(id) {
+  const response = await AuthorityApi.findById(id);
+  if (response.code === 200) {
+    return response;
+  } else {
+    ElMessage.error(response.message);
+  }
 }
 
 //分页查询
-function search() {
-  axios.get(`${API_BASE_URL}/user/v1/authority`, {
-    headers: {
-      'Authorization': token
-    },
-    params: {
-      name: nameInput.value,
-      current: currentPage.value,
-      size: pageSize.value
-    }
-  }).then(response => {
-    const result = response.data;
-    if (result.code === 200) {
-      records.value = result.result.records;
-      totalRecords.value = result.result.total;
-      records.value.forEach(item => {
-        item.type = item.type === 0 ? "模块" : item.type === 1 ? "菜单" : "按钮";
-      })
-    } else {
-      ElMessage.error(result.message);
-    }
-  })
-}
+async function pageList() {
+  const params = {
+    name: nameInput.value,
+    current: currentPage.value,
+    size: pageSize.value
+  }
+  const response = await AuthorityApi.getPage(params);
+  if (response.code === 200) {
+    records.value = response.records;
+    totalRecords.value = response.total;
+    records.value.forEach(item => {
+      item.type = item.type === 0 ? "模块" : item.type === 1 ? "菜单" : "按钮";
+    })
+  } else {
+    ElMessage.error(response.message);
+  }
 
-// 分页大小改变时
-function handleSizeChange(val) {
-  pageSize.value = val;
-  search();
-}
 
-// 当前页改变时
-function handleCurrentChange(val) {
-  currentPage.value = val;
-  search();
 }
 
 </script>
@@ -495,13 +432,6 @@ function handleCurrentChange(val) {
 .userTable {
   width: 98%;
   margin-left: 20px;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 30px;
 }
 
 

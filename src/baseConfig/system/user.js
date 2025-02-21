@@ -14,7 +14,7 @@ export const UserApi = {
 
     // 删除
     delete: async (id) => {
-        return await service.delete({url: `/user/v1/user/` + id})
+        return await service.delete(`/user/v1/user/` + id)
     },
 
     // 批量删除
@@ -34,7 +34,7 @@ export const UserApi = {
 
     // 重置密码
     resetPassword: async (id) => {
-        return await service.put({url: `/user/v1/user/resetPassword/` + id})
+        return await service.put(`/user/v1/user/resetPassword/` + id)
     },
 
     // 获取用户信息

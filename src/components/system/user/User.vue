@@ -7,7 +7,7 @@
     <div class="flex gap-4 mb-4">
       <el-input v-model="usernameInput" clearable class="searchInput" placeholder="用户名"/>
       <el-input v-model="nameInput" clearable class="searchInput" placeholder="姓名"/>
-      <el-button @click="search" class="searchButton" type="primary" plain>查询</el-button>
+      <el-button @click="pageList" class="searchButton" type="primary" plain>查询</el-button>
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary" plain>新增</el-button>
@@ -47,18 +47,12 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="pagination-container">
-      <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[10, 20, 30, 50, 100]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="totalRecords"
-      >
-      </el-pagination>
-    </div>
+    <PaginationComponent
+        :currentPage.sync="currentPage"
+        :pageSize.sync="pageSize"
+        :totalRecords="totalRecords"
+        @change="pageList"
+    />
 
     <!-- 新增对话框 -->
     <el-dialog v-model="showAddDialog" title="新增用户" width="35%">
@@ -190,6 +184,7 @@ import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
 import {UserApi} from "@/baseConfig/system/user.js"
+import PaginationComponent from '@/components/util/PageComponent.vue';
 
 //变量
 const records = ref([]);
@@ -207,7 +202,7 @@ function handleSelectionChange(selected) {
 
 //默认请求
 onMounted(() => {
-  search();
+  pageList();
 });
 
 //新增
@@ -245,7 +240,7 @@ async function addUser() {
       ElMessage.error(response.message);
     }
     showAddDialog.value = false;
-    search();
+    await pageList();
   } catch (error) {
     console.error(error);
   }
@@ -294,7 +289,7 @@ async function saveChanges() {
       ElMessage.error(response.message);
     }
     dialogVisible.value = false;
-    search();
+    await pageList();
   } catch (error) {
     console.error(error);
   }
@@ -305,7 +300,7 @@ async function deleted(row) {
   const response = await UserApi.delete(row.id)
   if (response.code === 200) {
     ElMessage.success('删除成功');
-    search();
+    await pageList();
   } else {
     ElMessage.error(response.message);
   }
@@ -320,7 +315,7 @@ async function enableStatus(row, enable) {
   const response = await UserApi.enableStatus(data)
   if (response.code === 200) {
     ElMessage.success('操作成功');
-    search();
+    await pageList();
   } else {
     ElMessage.error(response.message);
   }
@@ -348,7 +343,7 @@ async function batchDelete() {
     ElMessage.success('删除成功');
     records.value = records.value.filter(item => !ids.includes(item.id));
     selectedRows.value = [];
-    search();
+    await pageList();
   } else {
     ElMessage.error(response.message);
   }
@@ -370,7 +365,7 @@ async function batchEnable(enable) {
     ElMessage.success('操作成功');
     records.value = records.value.filter(item => !ids.includes(item.id));
     selectedRows.value = [];
-    search();
+    await pageList();
   } else {
     ElMessage.error(response.message);
   }
@@ -387,7 +382,7 @@ async function findById(id) {
 }
 
 //分页查询
-async function search() {
+async function pageList() {
   const params = {
     username: usernameInput.value,
     name: nameInput.value,
@@ -406,18 +401,6 @@ async function search() {
   } else {
     ElMessage.error(response.message);
   }
-}
-
-// 分页大小改变时
-function handleSizeChange(val) {
-  pageSize.value = val;
-  search();
-}
-
-// 当前页改变时
-function handleCurrentChange(val) {
-  currentPage.value = val;
-  search();
 }
 
 </script>
@@ -450,13 +433,6 @@ function handleCurrentChange(val) {
   display: flex;
   justify-content: space-around;
   align-items: center;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 30px;
 }
 
 </style>

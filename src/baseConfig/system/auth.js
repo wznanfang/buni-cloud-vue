@@ -1,6 +1,4 @@
 import service from '@/utils/interceptors.js'
-import {useUserStore} from '@/utils/userStore.js'
-import {ElMessage} from 'element-plus'
 
 
 export const AuthApi = {
@@ -12,12 +10,7 @@ export const AuthApi = {
 
     // 退出登录
     logout: async (router) => {
-        const userStore = useUserStore()
-        return service.post('/user/v1/loginOut').finally(() => {
-            userStore.clearUser()
-            ElMessage.success('退出登录成功')
-            router.push({name: 'Login'})
-        });
+        return service.post('/user/v1/loginOut');
     },
 
 

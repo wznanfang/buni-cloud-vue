@@ -21,6 +21,7 @@ import {useRouter} from 'vue-router'
 import {AuthApi} from '@/baseConfig/system/auth.js'
 import {useUserStore} from '@/utils/userStore.js'
 import {storeToRefs} from 'pinia'
+import {ElMessage} from "element-plus";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -31,7 +32,15 @@ function myself() {
 }
 
 async function loginOut() {
-  await AuthApi.logout(router)
+  const response = await AuthApi.logout(router)
+  if (response.code === 200) {
+    userStore.clearUser()
+    ElMessage.success('退出成功');
+    await router.push({name: 'Login'});
+  } else {
+    ElMessage.error(response.data.message || "未知错误");
+  }
+
 }
 </script>
 
