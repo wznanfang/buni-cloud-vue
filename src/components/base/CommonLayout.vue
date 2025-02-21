@@ -121,6 +121,10 @@ const defaultOpeneds = computed(() => {
   overflow: hidden;
 }
 
+.el-menu{
+  border: none;
+}
+
 .el-main {
   padding: 0 20px 20px 0;
   margin: 15px;

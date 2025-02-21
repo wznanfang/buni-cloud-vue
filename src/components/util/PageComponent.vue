@@ -51,6 +51,9 @@ export default {
 <style scoped>
 .pagination-container {
   margin-top: 20px;
-  text-align: center;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  text-align: right;
 }
 </style>
