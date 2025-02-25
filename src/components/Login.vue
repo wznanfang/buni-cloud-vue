@@ -38,8 +38,10 @@ const formData = ref({
 });
 
 async function handleLogin() {
-  formData.value.password = Encrypt(formData.value.password);
-  const response = await AuthApi.login(formData.value);
+  const loginVo = JSON.parse(JSON.stringify(formData.value));
+  loginVo.password = Encrypt(loginVo.password);
+  console.log(formData.value)
+  const response = await AuthApi.login(loginVo);
   if (response.code === 200) {
     const userStore = useUserStore()
     userStore.setToken(response.result.tokenVO)
