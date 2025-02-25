@@ -121,7 +121,7 @@ const defaultOpeneds = computed(() => {
   overflow: hidden;
 }
 
-.el-menu{
+.el-menu {
   border: none;
 }
 
