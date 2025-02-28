@@ -5,9 +5,8 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
-      <el-input v-model="usernameInput" clearable class="searchInput" placeholder="用户名"/>
-      <el-input v-model="nameInput" clearable class="searchInput" placeholder="姓名"/>
-      <el-button @click="pageList" class="searchButton" type="primary" plain>查询</el-button>
+      <el-input v-model="queryParams.username" @input="pageList" placeholder="用户名" clearable class="searchInput"/>
+      <el-input v-model="queryParams.name" @input="pageList" placeholder="姓名" clearable class="searchInput" />
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary" plain>新增</el-button>
@@ -48,8 +47,8 @@
       </el-table-column>
     </el-table>
     <PaginationComponent
-        :currentPage.sync="currentPage"
-        :pageSize.sync="pageSize"
+        :currentPage.sync="queryParams.current"
+        :pageSize.sync="queryParams.size"
         :totalRecords="totalRecords"
         @change="pageList"
     />
@@ -179,7 +178,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {onMounted, ref} from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
@@ -189,10 +188,6 @@ import PaginationComponent from '@/components/util/PageComponent.vue';
 //变量
 const records = ref([]);
 const selectedRows = ref([]);
-const usernameInput = ref('')
-const nameInput = ref('')
-const currentPage = ref(1); // 当前页
-const pageSize = ref(10); // 每页显示记录数
 const totalRecords = ref(0); // 总记录数
 
 //复选框
@@ -204,6 +199,13 @@ function handleSelectionChange(selected) {
 onMounted(() => {
   pageList();
 });
+
+const queryParams = reactive({
+  current: 1,
+  size: 10,
+  name: undefined,
+  username: undefined,
+})
 
 //新增
 const showAddDialog = ref(false);
@@ -383,13 +385,7 @@ async function findById(id) {
 
 //分页查询
 async function pageList() {
-  const params = {
-    username: usernameInput.value,
-    name: nameInput.value,
-    current: currentPage.value,
-    size: pageSize.value
-  };
-  const response = await UserApi.getPage(params)
+  const response = await UserApi.getPage(queryParams)
   if (response.code === 200) {
     records.value = response.result.records;
     totalRecords.value = response.result.total;
