@@ -9,24 +9,16 @@
       <el-input v-model="queryParams.name" @input="pageList" placeholder="姓名" clearable class="searchInput" />
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" type="primary" plain>新增</el-button>
-      <el-button @click="batchEnable(true)" type="warning" plain>启用</el-button>
-      <el-button @click="batchEnable(false)" type="warning" plain>禁用</el-button>
-      <el-button @click="batchDelete" type="danger" plain>删除</el-button>
+      <el-button @click="addRow" type="primary" >新增</el-button>
+      <el-button @click="batchEnable(true)" type="warning" :disabled="selectedRows.length===0">启用</el-button>
+      <el-button @click="batchEnable(false)" type="warning" :disabled="selectedRows.length===0">禁用</el-button>
+      <el-button @click="batchDelete" type="danger" :disabled="selectedRows.length===0">删除</el-button>
     </div>
-    <el-table
-        class="userTable"
-        :data="records"
-        border
-        stripe
-        fit
-        ref="table"
-        :cell-style="{ textAlign: 'center' }"
-        :header-cell-style="{ 'text-align': 'center' }"
-        @selection-change="handleSelectionChange"
+    <el-table class="userTable" :data="records" ref="table" :cell-style="{ textAlign: 'center' }"
+              :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" fixed width="45"/>
-      <el-table-column prop="username" label="用户名" width="120"/>
+      <el-table-column prop="username" label="用户名" width="120" fixed/>
       <el-table-column prop="name" label="姓名" width="120"/>
       <el-table-column prop="age" label="年龄" width="90"/>
       <el-table-column prop="sex" label="性别" width="90"/>
@@ -53,54 +45,54 @@
         @change="pageList"
     />
 
-    <!-- 新增对话框 -->
-    <el-dialog v-model="showAddDialog" title="新增用户" width="35%">
-      <el-form :model="addForm" label-width="100px">
+    <!-- 新增/编辑对话框 -->
+    <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="35%" @closed="resetForm">
+      <el-form ref="addFormRef" :model="userForm" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="用户名">
-              <el-input v-model="addForm.username" clearable></el-input>
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="userForm.username" :disabled="!addMode" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="密码">
-              <el-input v-model="addForm.password" type="password" show-password clearable></el-input>
+            <el-form-item label="密码" prop="password">
+              <el-input v-model="userForm.password" type="password" :disabled="!addMode" show-password clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="姓名">
-              <el-input v-model="addForm.name" clearable></el-input>
+            <el-form-item label="姓名" prop="name">
+              <el-input v-model="userForm.name" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="年龄">
-              <el-input v-model="addForm.age" clearable></el-input>
+            <el-form-item label="年龄" prop="age">
+              <el-input v-model="userForm.age" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="性别">
-              <el-select v-model="addForm.sex" placeholder="请选择性别">
-                <el-option label="男" value='1'></el-option>
-                <el-option label="女" value='0'></el-option>
+            <el-form-item label="性别" prop="sex">
+              <el-select v-model="userForm.sex" placeholder="请选择性别">
+                <el-option label="男" value="1"></el-option>
+                <el-option label="女" value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="电话">
-              <el-input v-model="addForm.tel" clearable></el-input>
+            <el-form-item label="电话" prop="tel">
+              <el-input v-model="userForm.tel" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="状态">
-              <el-select v-model="addForm.enable" placeholder="是否启用">
-                <el-option label="启用" value='1'></el-option>
-                <el-option label="禁用" value='0'></el-option>
+            <el-form-item label="状态" prop="enable">
+              <el-select v-model="userForm.enable" placeholder="是否启用">
+                <el-option label="启用" value="1"></el-option>
+                <el-option label="禁用" value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -109,65 +101,8 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showAddDialog = false">取消</el-button>
-      <el-button type="primary" @click="addUser">保存</el-button>
-    </span>
-      </template>
-    </el-dialog>
-
-    <!-- 编辑对话框 -->
-    <el-dialog v-model="dialogVisible" title="编辑信息" width="35%">
-      <el-form :model="editForm" label-width="100px">
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="用户名">
-              <el-input v-model="editForm.username" disabled></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="姓名">
-              <el-input v-model="editForm.name" clearable></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="年龄">
-              <el-input v-model="editForm.age" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="性别">
-              <el-select v-model="editForm.sex" placeholder="请选择性别">
-                <el-option label="男" value='1'></el-option>
-                <el-option label="女" value='0'></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="电话">
-              <el-input v-model="editForm.tel" disabled></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="状态">
-              <el-input v-model="editForm.enable" disabled></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="管理员">
-              <el-input v-model="editForm.admin" disabled></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-    <span class="dialog-footer">
-      <el-button @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="saveChanges">保存</el-button>
+<!--      <el-button type="primary" @click="addUser">保存</el-button>-->
+      <el-button type="primary" @click="submitForm">{{ addMode ? '新增用户' : '保存修改' }}</el-button>
     </span>
       </template>
     </el-dialog>
@@ -189,6 +124,9 @@ import PaginationComponent from '@/components/util/PageComponent.vue';
 const records = ref([]);
 const selectedRows = ref([]);
 const totalRecords = ref(0); // 总记录数
+const showAddDialog = ref(false);
+const addFormRef = ref(null);
+const addMode = ref(true); // true: 新增模式，false: 编辑模式
 
 //复选框
 function handleSelectionChange(selected) {
@@ -206,73 +144,106 @@ const queryParams = reactive({
   name: undefined,
   username: undefined,
 })
-
-//新增
-const showAddDialog = ref(false);
-
-// 显示新增对话框
-function addRow() {
-  addForm.username = '';
-  addForm.password = '';
-  addForm.name = '';
-  addForm.age = '';
-  addForm.sex = '1';
-  addForm.tel = '';
-  addForm.enable = '0';
-  showAddDialog.value = true;
-}
-
-const addForm = ref({
-  username: '',
-  password: '',
-  name: '',
-  age: '',
-  sex: '1',
-  tel: '',
-  enable: '0',
+const userForm = ref({
+  username: "",
+  password: "",
+  name: "",
+  age: "",
+  sex: "1",
+  tel: "",
+  enable: "0",
 });
 
-async function addUser() {
+/**
+ * 显示新增对话框
+ */
+function addRow() {
+  showAddDialog.value = true;
+  addMode.value = true;
+  resetForm();
+}
+
+/**
+ * 重置表单
+ */
+function resetForm() {
+  if (addFormRef.value) {
+    addFormRef.value.resetFields(); // 清除表单验证
+  }
+  userForm.value = {
+    username: "",
+    password: "",
+    name: "",
+    age: "",
+    sex: "1",
+    tel: "",
+    enable: "0",
+  };
+}
+
+/**
+ * 提交表单
+ */
+async function submitForm() {
+  if (!addFormRef.value) {
+    return;
+  }
   try {
-    addForm.password = Encrypt(addForm.password);
-    const response = await UserApi.save(addForm)
-    if (response.code === 200) {
-      ElMessage.success('添加成功');
+    await addFormRef.value.validate(); // 校验表单数据
+    if (addMode.value) {
+      await addUser();
     } else {
-      ElMessage.error(response.message);
+      await saveChanges();
     }
-    showAddDialog.value = false;
-    await pageList();
   } catch (error) {
-    console.error(error);
+    console.error("表单提交错误:", error);
   }
 }
 
-//编辑
-const dialogVisible = ref(false);
-const editForm = ref({
-  username: '',
-  name: '',
-  age: '',
-  sex: '',
-  tel: '',
-  enable: '',
-  admin: ''
-});
+/**
+ * 新增用户
+ */
+async function addUser() {
+  if (!addFormRef.value) {
+    return;
+  }
+  try {
+    // 校验表单数据
+    await addFormRef.value.validate();
+    const payload = {
+      ...userForm.value,
+      password: Encrypt(userForm.value.password),
+    };
+    // 发送请求
+    const res = await UserApi.save(payload);
+    if (res.code === 200) {
+      ElMessage.success("添加成功");
+      showAddDialog.value = false;
+      resetForm();
+      // 刷新用户列表
+      await pageList();
+    } else {
+      ElMessage.error(res.message);
+    }
+  } catch (error) {
+    console.error("表单提交错误:", error);
+  }
+}
 
 // 显示编辑对话框
 async function editRow(row) {
   try {
-    const response = await findById(row.id);
-    editForm.id = response.data.result.id;
-    editForm.username = response.data.result.username;
-    editForm.name = response.data.result.name;
-    editForm.age = response.data.result.age;
-    editForm.sex = response.data.result.sex === 1 ? '男' : '女';
-    editForm.tel = response.data.result.tel;
-    editForm.enable = response.data.result.enable === 1 ? '启用' : '禁用';
-    editForm.admin = response.data.result.admin === 1 ? '是' : '否';
-    dialogVisible.value = true;
+    const res = await findById(String(row.id));
+    userForm.value.id = res.result.id;
+    userForm.value.username = res.result.username;
+    userForm.value.name = res.result.name;
+    userForm.value.age = res.result.age;
+    userForm.value.sex = res.result.sex === 1 ? '男' : '女';
+    userForm.value.tel = res.result.tel;
+    userForm.value.enable = res.result.enable === 1 ? '启用' : '禁用';
+    userForm.value.admin = res.result.admin === 1 ? '是' : '否';
+    showAddDialog.value = true;
+    addMode.value = false;
   } catch (error) {
     ElMessage.error('查询失败，请稍后再试');
   }
@@ -281,16 +252,16 @@ async function editRow(row) {
 // 更改
 async function saveChanges() {
   try {
-    editForm.sex = editForm.sex === '男' || editForm.sex === '1' ? 1 : 0;
-    editForm.enable = editForm.enable === '启用' || editForm.enable === '1' ? 1 : 0;
-    editForm.admin = editForm.admin === '是' || editForm.admin === '1' ? 1 : 0;
-    const response = await UserApi.update(editForm)
-    if (response.code === 200) {
+    userForm.value.sex = userForm.value.sex === '男' || userForm.value.sex === '1' ? 1 : 0;
+    userForm.value.enable = userForm.value.enable === '启用' || userForm.value.enable === '1' ? 1 : 0;
+    userForm.value.admin = userForm.value.admin === '是' || userForm.value.admin === '1' ? 1 : 0;
+    const res = await UserApi.update(userForm.value)
+    if (res.code === 200) {
       ElMessage.success('修改成功');
     } else {
-      ElMessage.error(response.message);
+      ElMessage.error(res.message);
     }
-    dialogVisible.value = false;
+    showAddDialog.value = false;
     await pageList();
   } catch (error) {
     console.error(error);
@@ -314,6 +285,7 @@ async function enableStatus(row, enable) {
     id: row.id,
     enable: enable ? 1 : 0
   };
+  console.log(data);
   const response = await UserApi.enableStatus(data)
   if (response.code === 200) {
     ElMessage.success('操作成功');

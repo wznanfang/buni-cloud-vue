@@ -4,12 +4,12 @@ export const UserApi = {
 
     // 新增
     save: async (userVO) => {
-        return await service.post({url: '/user/v1/user', userVO});
+        return await service.post('/user/v1/user', userVO);
     },
 
     // 修改
     update: async (userVO) => {
-        return await service.put({url: '/user/v1/user', userVO});
+        return await service.put('/user/v1/user', userVO);
     },
 
     // 删除
@@ -19,17 +19,17 @@ export const UserApi = {
 
     // 批量删除
     batchDelete: async (ids) => {
-        return await service.delete({url: '/user/v1/user/batchDelete', data: ids});
+        return await service.delete('/user/v1/user/batchDelete', { data: ids });
     },
 
     // 启用-禁用
     enableStatus: async (enableVo) => {
-        return await service.put({url: '/user/v1/user/forbidden', data: enableVo});
+        return await service.put('/user/v1/user/forbidden', enableVo);
     },
 
     // 批量启用
     batchEnable: async (enableVo) => {
-        return await service.put({url: '/user/v1/user/batchEnable', data: enableVo});
+        return await service.put( '/user/v1/user/batchEnable', enableVo);
     },
 
     // 重置密码
@@ -44,7 +44,7 @@ export const UserApi = {
 
     // 分页查询
     getPage: async (params) => {
-        return await service.get({url: `/user/v1/user`, params})
+        return await service.get(`/user/v1/user`, { params })
     },
 
 

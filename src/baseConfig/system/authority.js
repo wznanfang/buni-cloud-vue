@@ -30,7 +30,7 @@ export const AuthorityApi = {
 
     // 分页查询
     getPage: async (params) => {
-        return await service.get({url: `/user/v1/user`, params})
+        return await service.get(`/user/v1/authority`, { params })
     },
 
 

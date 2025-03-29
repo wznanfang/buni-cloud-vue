@@ -40,18 +40,17 @@ const formData = ref({
 async function handleLogin() {
   const loginVo = JSON.parse(JSON.stringify(formData.value));
   loginVo.password = Encrypt(loginVo.password);
-  console.log(formData.value)
-  const response = await AuthApi.login(loginVo);
-  if (response.code === 200) {
+  const res = await AuthApi.login(loginVo);
+  if (res.code === 200) {
     const userStore = useUserStore()
-    userStore.setToken(response.result.tokenVO)
+    userStore.setToken(res.result.tokenVO)
     // 获取用户信息
-    const userInfoRes = await UserApi.getUserInfo(response.result.id);
+    const userInfoRes = await UserApi.getUserInfo(res.result.id);
     userStore.setUser(userInfoRes)
     ElMessage.success('登录成功');
     await router.push({name: 'Home'});
   } else {
-    ElMessage.error(response.data.message || "未知错误");
+    ElMessage.error(res.data.message || "未知错误");
   }
 }
 </script>
