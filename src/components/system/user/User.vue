@@ -16,19 +16,18 @@
     </div>
 
 <!--  内容展示区域  -->
-    <el-table class="userTable" :data="records" ref="table" :cell-style="{ textAlign: 'center' }"
-              :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange"
+    <el-table class="userTable" :data="records" fit stripe ref="table" @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" fixed width="45"/>
-      <el-table-column prop="username" label="用户名" width="120" fixed/>
-      <el-table-column prop="name" label="姓名" width="120"/>
-      <el-table-column prop="age" label="年龄" width="90"/>
-      <el-table-column prop="sex" label="性别" width="90"/>
-      <el-table-column prop="tel" label="电话" width="120"/>
-      <el-table-column prop="enable" label="状态" width="90"/>
-      <el-table-column prop="admin" label="管理员" width="90"/>
-      <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column label="操作" fixed="right" width="200">
+      <el-table-column prop="username" label="用户名" fixed/>
+      <el-table-column prop="name" label="姓名"/>
+      <el-table-column prop="age" label="年龄"/>
+      <el-table-column prop="sex" label="性别"/>
+      <el-table-column prop="tel" label="电话"/>
+      <el-table-column prop="enable" label="状态"/>
+      <el-table-column prop="admin" label="管理员"/>
+      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
