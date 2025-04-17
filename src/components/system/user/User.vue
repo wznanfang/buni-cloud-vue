@@ -6,14 +6,16 @@
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
       <el-input v-model="queryParams.username" @input="pageList" placeholder="用户名" clearable class="searchInput"/>
-      <el-input v-model="queryParams.name" @input="pageList" placeholder="姓名" clearable class="searchInput" />
+      <el-input v-model="queryParams.name" @input="pageList" placeholder="姓名" clearable class="searchInput"/>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" type="primary" >新增</el-button>
+      <el-button @click="addRow" type="primary">新增</el-button>
       <el-button @click="batchEnable(true)" type="warning" :disabled="selectedRows.length===0">启用</el-button>
       <el-button @click="batchEnable(false)" type="warning" :disabled="selectedRows.length===0">禁用</el-button>
       <el-button @click="batchDelete" type="danger" :disabled="selectedRows.length===0">删除</el-button>
     </div>
+
+<!--  内容展示区域  -->
     <el-table class="userTable" :data="records" ref="table" :cell-style="{ textAlign: 'center' }"
               :header-cell-style="{ 'text-align': 'center' }" @selection-change="handleSelectionChange"
     >
@@ -26,14 +28,25 @@
       <el-table-column prop="enable" label="状态" width="90"/>
       <el-table-column prop="admin" label="管理员" width="90"/>
       <el-table-column prop="createTime" label="创建时间" width="180"/>
-      <el-table-column label="操作" fixed="right" width="340">
+      <el-table-column label="操作" fixed="right" width="200">
         <template v-slot="scope">
           <div class="button-container">
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
-            <el-button @click="deleted(scope.row)" :icon="Delete" type="danger"></el-button>
-            <el-button v-if="scope.row.enable === '启用'" @click="enableStatus(scope.row, false)" type="warning">禁用</el-button>
-            <el-button v-else @click="enableStatus(scope.row, true)" type="warning">启用</el-button>
-            <el-button @click="resetPassword(scope.row)" type="danger">重置密码</el-button>
+            <el-dropdown>
+              <el-button type="primary">更多
+                <el-icon class="el-icon--right">
+                  <arrow-down/>
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="deleted(scope.row)" :icon="Delete">删除</el-dropdown-item>
+                  <el-dropdown-item v-if="scope.row.enable === '启用'" @click="enableStatus(scope.row, false)" :icon="Open">禁用</el-dropdown-item>
+                  <el-dropdown-item v-else @click="enableStatus(scope.row, true)" :icon="Open">启用</el-dropdown-item>
+                  <el-dropdown-item @click="resetPassword(scope.row)" :icon="Lock">重置密码</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -48,19 +61,17 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="35%" @closed="resetForm">
       <el-form ref="addFormRef" :model="userForm" label-width="100px">
-        <el-row :gutter="15">
+        <el-row :gutter="20">
           <el-col :span="11">
             <el-form-item label="用户名" prop="username">
               <el-input v-model="userForm.username" :disabled="!addMode" clearable></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="11">
+          <el-col :span="11" v-if="addMode">
             <el-form-item label="密码" prop="password">
-              <el-input v-model="userForm.password" type="password" :disabled="!addMode" show-password clearable></el-input>
+              <el-input v-model="userForm.password" type="password" show-password clearable></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="姓名" prop="name">
               <el-input v-model="userForm.name" clearable></el-input>
@@ -71,8 +82,6 @@
               <el-input v-model="userForm.age" clearable></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="性别" prop="sex">
               <el-select v-model="userForm.sex" placeholder="请选择性别">
@@ -86,8 +95,6 @@
               <el-input v-model="userForm.tel" clearable></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="状态" prop="enable">
               <el-select v-model="userForm.enable" placeholder="是否启用">
@@ -101,7 +108,6 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showAddDialog = false">取消</el-button>
-<!--      <el-button type="primary" @click="addUser">保存</el-button>-->
       <el-button type="primary" @click="submitForm">{{ addMode ? '新增用户' : '保存修改' }}</el-button>
     </span>
       </template>
@@ -115,7 +121,7 @@
 import CommonLayout from "@/components/base/CommonLayout.vue";
 import {onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
-import {Delete, Edit} from '@element-plus/icons-vue'
+import {ArrowDown, Delete, Edit, Lock,Open} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
 import {UserApi} from "@/baseConfig/system/user.js"
 import PaginationComponent from '@/components/util/PageComponent.vue';
