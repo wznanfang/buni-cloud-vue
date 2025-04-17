@@ -30,6 +30,7 @@ import {UserApi} from "@/baseConfig/system/user.js";
 import {Encrypt} from "@/utils/secret.js";
 import {useUserStore} from "@/utils/userStore.js";
 
+const userStore = useUserStore()
 const router = useRouter();
 
 const formData = ref({
@@ -42,11 +43,10 @@ async function handleLogin() {
   loginVo.password = Encrypt(loginVo.password);
   const res = await AuthApi.login(loginVo);
   if (res.code === 200) {
-    const userStore = useUserStore()
     userStore.setToken(res.result.tokenVO)
     // 获取用户信息
     const userInfoRes = await UserApi.getUserInfo(res.result.id);
-    userStore.setUser(userInfoRes)
+    userStore.setUser(userInfoRes.result)
     ElMessage.success('登录成功');
     await router.push({name: 'Home'});
   } else {

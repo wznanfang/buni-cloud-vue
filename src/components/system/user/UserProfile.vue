@@ -81,17 +81,15 @@ import CommonLayout from "@/components/base/CommonLayout.vue";
 
 import {onMounted, reactive, ref} from 'vue';
 import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus';
-import {useStore} from 'vuex';
 import {useRouter} from 'vue-router';
 import axios from "axios";
 import {API_BASE_URL, BEARER} from "@/config.js";
-import {AuthApi} from "@/baseConfig/system/auth.js";
+import {UserApi} from "@/baseConfig/system/user.js";
 
 const router = useRouter();
 const loginUser = JSON.parse(localStorage.getItem('loginUser'));
 const tokenVO = JSON.parse(localStorage.getItem('authToken'));
 const token = BEARER + tokenVO.token;
-const store = useStore();
 const mySelfInfo = ref({});
 const avatarUrl = ref('');
 
@@ -101,13 +99,11 @@ onMounted(() => {
 
 //查询登录用户信息
 function myself() {
-  AuthApi.getUserInfo(loginUser.id, token).then(result => {
-    mySelfInfo.value = result;
+  UserApi.getUserInfo(loginUser.id, token).then(result => {
+    mySelfInfo.value = result.result;
     mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
     mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
-    store.commit('myself', mySelfInfo.value);
-    avatarUrl.value = result.avatar;
-    localStorage.setItem('loginUser', JSON.stringify(result));
+    avatarUrl.value = mySelfInfo.value.avatar;
   })
 }
 
@@ -159,21 +155,16 @@ function editUserAvatar(avatar) {
 }
 
 // 保存修改
-function saveChanges() {
+async function saveChanges() {
   mySelfInfo.value.sex = mySelfInfo.value.sex === '男' || mySelfInfo.value.sex === '1' ? 1 : 0;
   mySelfInfo.value.enable = mySelfInfo.value.enable === '启用' || mySelfInfo.value.enable === '1' ? 1 : 0;
-  axios.put(`${API_BASE_URL}/user/v1/user`, mySelfInfo.value, {
-    headers: {
-      'Authorization': token
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('修改成功');
-      myself();
-    } else {
-      ElMessage.error('修改失败');
-    }
-  })
+  const res = await UserApi.update(mySelfInfo.value)
+  if (res.code === 200) {
+    myself();
+    ElMessage.success('修改成功');
+  } else {
+    ElMessage.error(res.message);
+  }
 }
 
 const updatePassWordForm = reactive({

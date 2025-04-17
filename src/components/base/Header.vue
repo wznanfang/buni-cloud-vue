@@ -4,7 +4,7 @@
   </div>
   <div class="header-container">
     <el-dropdown>
-      <span class="el-dropdown-link">{{ loginUser?.name }}</span>
+      <div class="el-dropdown-link">{{ loginUser?.name }}</div>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
@@ -26,6 +26,7 @@ import {ElMessage} from "element-plus";
 const router = useRouter()
 const userStore = useUserStore()
 const {loginUser} = storeToRefs(userStore)
+console.log('Login user:', loginUser);
 
 function myself() {
   router.push('/UserProfile')
