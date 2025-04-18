@@ -1,51 +1,53 @@
 <template>
   <CommonLayout>
-    <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item>个人中心</el-breadcrumb-item>
-    </el-breadcrumb>
     <el-card class="user-card" :body-style="{ padding: '50px' }">
+      <div>
+        <h2>个人中心</h2>
+      </div>
       <div class="avatar-icon">
-        <el-avatar class="myself-avatar" :src="avatarUrl"/>
-        <el-button class="edit-avatar" @click="selectAvatar" type="primary" plain>修改头像</el-button>
+        <el-avatar class="myself-avatar" @click="selectAvatar" :src="avatarUrl"/>
         <input ref="fileInput" type="file" accept="image/*" style="display: none;" @change="changeAvatar"/>
       </div>
-      <h2>个人信息</h2>
-      <el-form label-width="100px" class="user-form">
+      <h3>个人信息</h3>
+      <el-form
+          ref="formRef"
+          :model="mySelfInfo"
+          :rules="formRules"
+          label-width="100px"
+          class="user-form">
         <el-row gutter="20">
-          <el-col :span="10">
-            <el-form-item label="用户名">
+          <el-col :span="8">
+            <el-form-item label="用户名" prop="username">
               <el-input v-model="mySelfInfo.username" disabled/>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
-            <el-form-item label="姓名">
+          <el-col :span="8">
+            <el-form-item label="姓名" prop="name">
               <el-input v-model="mySelfInfo.name" clearable/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="年龄" prop="age">
+              <el-input v-model="mySelfInfo.age" clearable/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row gutter="20">
-          <el-col :span="10">
-            <el-form-item label="年龄">
-              <el-input v-model="mySelfInfo.age" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="10">
-            <el-form-item label="性别">
+          <el-col :span="8">
+            <el-form-item label="性别" prop="sex">
               <el-select v-model="mySelfInfo.sex" placeholder="请选择性别">
                 <el-option label="男" value="1"></el-option>
                 <el-option label="女" value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row gutter="20">
-          <el-col :span="10">
-            <el-form-item label="电话">
+          <el-col :span="8">
+            <el-form-item label="电话" prop="tel">
               <el-input v-model="mySelfInfo.tel" clearable/>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
-            <el-form-item label="状态">
+          <el-col :span="8">
+            <el-form-item label="状态" prop="enable">
               <el-input v-model="mySelfInfo.enable" disabled/>
             </el-form-item>
           </el-col>
@@ -54,17 +56,27 @@
       <div class="update-container">
         <el-button @click="saveChanges" class="editButton" type="primary">保存</el-button>
       </div>
-      <h2>修改密码</h2>
-      <el-form :model="updatePassWordForm" label-width="100px" class="user-form">
+      <h3>修改密码</h3>
+      <el-form
+          ref="formRef"
+          :model="updatePassWordForm"
+          :rules="updatePasswordRules"
+          label-width="100px"
+          class="user-form">
         <el-row gutter="20">
-          <el-col :span="10">
-            <el-form-item label="旧密码">
+          <el-col :span="8">
+            <el-form-item label="旧密码" prop="oldPassword">
               <el-input v-model="updatePassWordForm.oldPassword" show-password clearable/>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
-            <el-form-item label="新密码">
+          <el-col :span="8">
+            <el-form-item label="新密码" prop="newPassword">
               <el-input v-model="updatePassWordForm.newPassword" show-password clearable/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="确认密码" prop="checkPassword">
+              <el-input v-model="updatePassWordForm.checkPassword" show-password clearable/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -76,7 +88,7 @@
   </CommonLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import CommonLayout from "@/components/base/CommonLayout.vue";
 import {onMounted, reactive, ref} from 'vue';
 import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus';
@@ -88,9 +100,44 @@ import {storeToRefs} from "pinia";
 const userStore = useUserStore()
 
 const {loginUser} = storeToRefs(userStore)
-
+const formRef = ref() // 表单 Ref
 const mySelfInfo = ref({});
 const avatarUrl = ref('');
+
+const updatePassWordForm = reactive({
+  id: loginUser.value.id,
+  oldPassword: '',
+  newPassword: '',
+  checkPassword: '',
+});
+
+const formRules = reactive({
+  username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
+  name: [{required: true, message: '名字不能为空', trigger: 'blur'}],
+  age: [{required: true, message: '年龄不能为空', trigger: 'blur'}],
+  sex: [{required: true, message: '性别不能为空', trigger: 'blur'}],
+  tel: [{required: true, message: '电话不能为空', trigger: 'blur'}],
+  enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
+
+})
+
+const updatePasswordRules = reactive({
+  oldPassword: [{required: true, message: '旧密码不能为空', trigger: 'blur'}],
+  newPassword: [{required: true, message: '新密码不能为空', trigger: 'blur'}],
+  checkPassword: [
+    {required: true, message: "请再次输入密码", trigger: "blur"},
+    {
+      validator: (rule: any, value: string, callback: any) => {
+        if (value !== updatePassWordForm.value.password) {
+          callback(new Error("两次输入的密码不一致"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
+  ],
+})
 
 onMounted(() => {
   myself()
@@ -138,14 +185,10 @@ async function saveChanges() {
   ElMessage.success('修改成功');
 }
 
-const updatePassWordForm = reactive({
-  id: loginUser.value.id,
-  oldPassword: '',
-  newPassword: '',
-});
-
 // 修改密码
 async function updatePassword() {
+  // 校验表单
+  await formRef.value.validate()
   await UserApi.updatePassword(updatePassWordForm)
   //移除token缓存信息
   userStore.clearUser()
@@ -181,13 +224,6 @@ async function updatePassword() {
   width: 100px;
   height: 100px;
 }
-
-.edit-avatar {
-  display: block;
-  margin: 10px auto;
-  height: 35px;
-}
-
 
 .user-form {
   margin: 50px 0 20px 100px;
