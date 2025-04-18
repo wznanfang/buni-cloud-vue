@@ -78,18 +78,17 @@
 
 <script setup>
 import CommonLayout from "@/components/base/CommonLayout.vue";
-
 import {onMounted, reactive, ref} from 'vue';
 import {ElCard, ElCol, ElForm, ElFormItem, ElInput, ElMessage, ElRow} from 'element-plus';
-import {useRouter} from 'vue-router';
-import axios from "axios";
-import {API_BASE_URL, BEARER} from "@/config.js";
 import {UserApi} from "@/baseConfig/system/user.js";
+import {SystemFileApi} from "@/baseConfig/system/systemFile.js";
+import {useUserStore} from '@/utils/userStore.js'
+import {storeToRefs} from "pinia";
 
-const router = useRouter();
-const loginUser = JSON.parse(localStorage.getItem('loginUser'));
-const tokenVO = JSON.parse(localStorage.getItem('authToken'));
-const token = BEARER + tokenVO.token;
+const userStore = useUserStore()
+
+const {loginUser} = storeToRefs(userStore)
+
 const mySelfInfo = ref({});
 const avatarUrl = ref('');
 
@@ -98,13 +97,12 @@ onMounted(() => {
 });
 
 //查询登录用户信息
-function myself() {
-  UserApi.getUserInfo(loginUser.id, token).then(result => {
-    mySelfInfo.value = result.result;
-    mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
-    mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
-    avatarUrl.value = mySelfInfo.value.avatar;
-  })
+async function myself() {
+  const res = await UserApi.getUserInfo(loginUser.value.id);
+  mySelfInfo.value = res.result;
+  mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
+  mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
+  avatarUrl.value = mySelfInfo.value.avatar;
 }
 
 function selectAvatar() {
@@ -115,79 +113,43 @@ function selectAvatar() {
 }
 
 // 修改头像
-function changeAvatar(event) {
+async function changeAvatar(event) {
   const file = event.target.files[0]
   if (file) {
     const formData = new FormData();
     formData.append('file', file);
-    axios.post(`${API_BASE_URL}/file/v1/upload`, formData, {
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'multipart/form-data'
-      }
-    }).then(response => {
-      if (response.data.code === 200) {
-        editUserAvatar(response.data.result);
-      } else {
-        ElMessage.error('修改失败');
-      }
-    })
+    let res = await SystemFileApi.upload(formData);
+    const body = {
+      id: loginUser.id,
+      avatar: res.result
+    }
+    await UserApi.editAvatar(body)
+    await myself();
+    ElMessage.success('修改成功');
   }
 }
 
-function editUserAvatar(avatar) {
-  const body = {
-    id: loginUser.id,
-    avatar: avatar
-  }
-  axios.put(`${API_BASE_URL}/user/v1/user/avatar`, body, {
-    headers: {
-      'Authorization': token,
-    }
-  }).then(async response => {
-    if (response.data.code === 200) {
-      ElMessage.success('修改成功');
-      myself()
-    } else {
-      ElMessage.error('修改失败');
-    }
-  })
-}
-
-// 保存修改
+// 修改用户信息
 async function saveChanges() {
   mySelfInfo.value.sex = mySelfInfo.value.sex === '男' || mySelfInfo.value.sex === '1' ? 1 : 0;
   mySelfInfo.value.enable = mySelfInfo.value.enable === '启用' || mySelfInfo.value.enable === '1' ? 1 : 0;
-  const res = await UserApi.update(mySelfInfo.value)
-  if (res.code === 200) {
-    myself();
-    ElMessage.success('修改成功');
-  } else {
-    ElMessage.error(res.message);
-  }
+  await UserApi.update(mySelfInfo.value)
+  await myself();
+  ElMessage.success('修改成功');
 }
 
 const updatePassWordForm = reactive({
-  id: loginUser.id,
+  id: loginUser.value.id,
   oldPassword: '',
   newPassword: '',
 });
 
 // 修改密码
-function updatePassword() {
-  axios.put(`${API_BASE_URL}/user/v1/user/password`, updatePassWordForm, {
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    }
-  }).then(response => {
-    if (response.data.code === 200) {
-      ElMessage.success('修改成功');
-      logout(router);
-    } else {
-      ElMessage.error(response.data.message);
-    }
-  })
+async function updatePassword() {
+  await UserApi.updatePassword(updatePassWordForm)
+  //移除token缓存信息
+  userStore.clearUser()
+  ElMessage.success('修改成功，请重新登录');
 }
 
 

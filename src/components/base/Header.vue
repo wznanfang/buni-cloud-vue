@@ -1,6 +1,6 @@
 <template>
   <div class="logo">
-    <span>不逆云系统</span>
+    <span>不逆</span>
   </div>
   <div class="header-container">
     <el-dropdown>
@@ -26,7 +26,6 @@ import {ElMessage} from "element-plus";
 const router = useRouter()
 const userStore = useUserStore()
 const {loginUser} = storeToRefs(userStore)
-console.log('Login user:', loginUser);
 
 function myself() {
   router.push('/UserProfile')

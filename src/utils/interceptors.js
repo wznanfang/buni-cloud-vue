@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
-import {API_BASE_URL, BEARER,LOGIN_USER,AUTH_TOKEN} from '@/config.js'
+import {API_BASE_URL, BEARER,AUTH_TOKEN} from '@/config.js'
 
 // 创建 Axios 实例
 const service = axios.create({
