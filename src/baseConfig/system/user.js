@@ -19,7 +19,7 @@ export const UserApi = {
 
     // 批量删除
     batchDelete: async (ids) => {
-        return await service.delete('/user/v1/user/batchDelete', {data: ids});
+        return await service.delete('/user/v1/user/batchDelete', {data: {ids}});
     },
 
     // 启用-禁用

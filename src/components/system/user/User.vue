@@ -26,7 +26,7 @@
       <el-table-column prop="tel" label="电话"/>
       <el-table-column prop="enable" label="状态"/>
       <el-table-column prop="admin" label="管理员"/>
-      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
       <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
           <div class="button-container">

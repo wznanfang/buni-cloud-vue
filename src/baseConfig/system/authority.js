@@ -7,18 +7,22 @@ export const AuthorityApi = {
         return await service.post('/user/v1/authority', AddVO);
     },
 
+    // 修改
     update: async (UpdateVO) => {
         return await service.put('/user/v1/authority', UpdateVO);
     },
 
+    // 删除
     delete: async (id) => {
         return await service.delete(`/user/v1/authority/` + id)
     },
 
+    // 批量删除
     batchDelete: async (ids) => {
-        return await service.delete(`/user/v1/authority`, ids)
+        return await service.delete(`/user/v1/authority/batchDelete`, {data: {ids}});
     },
 
+    // 根据id查询
     findById: async (id) => {
         return await service.get(`/user/v1/authority/${id}`)
     },
@@ -30,7 +34,7 @@ export const AuthorityApi = {
 
     // 分页查询
     getPage: async (params) => {
-        return await service.get(`/user/v1/authority`, { params })
+        return await service.get(`/user/v1/authority`, {params})
     },
 
 

@@ -10,7 +10,7 @@
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary" plain>新增</el-button>
-      <el-button @click="batchDelete" type="danger" plain>删除</el-button>
+      <el-button @click="batchDelete" type="danger" plain :disabled="selectedRows.length===0">删除</el-button>
     </div>
     <el-table
         class="userTable"
@@ -24,7 +24,7 @@
         @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" fixed width="45"/>
-      <el-table-column prop="name" label="名字" width="150" show-overflow-tooltip/>
+      <el-table-column prop="name" label="名字" width="150" fixed show-overflow-tooltip/>
       <el-table-column prop="type" label="类型" width="120"/>
       <el-table-column prop="code" label="标识码" width="150"/>
       <el-table-column prop="sort" label="序号" width="120"/>
@@ -103,7 +103,7 @@
       </el-form>
       <template #footer>
     <span class="dialog-footer">
-      <el-button @click="showAddDialog = false">取消</el-button>
+      <el-button @click="showDialog = false">取消</el-button>
       <el-button type="primary" @click="addAuthority">保存</el-button>
     </span>
       </template>
@@ -163,7 +163,7 @@
       </el-form>
       <template #footer>
     <span class="dialog-footer">
-      <el-button @click="showEditDialog = false">取消</el-button>
+      <el-button @click="showDialog = false">取消</el-button>
       <el-button type="primary" @click="saveChanges">保存</el-button>
     </span>
       </template>
@@ -209,31 +209,6 @@ const params = reactive({
 //复选框
 function handleSelectionChange(selected) {
   selectedRows.value = selected;
-}
-
-//默认请求
-onMounted(() => {
-  pageList();
-});
-
-const cascaderOptions = ref([]);
-const cascaderProps = {
-  value: 'id',
-  label: 'name',
-  children: 'children',
-  checkStrictly: true,
-};
-
-//请求父级菜单
-async function fetchParentMenus() {
-  const response = await AuthorityApi.findParent();
-  if (response.code === 200) {
-    cascaderOptions.value = response.result;
-    return cascaderOptions.value;
-  } else {
-    ElMessage.error(response.message);
-    return [];
-  }
 }
 
 function parentChange(selectedValues) {
@@ -310,15 +285,10 @@ async function batchDelete() {
     return;
   }
   const ids = selectedRows.value.map(row => row.id);
-  const response = await AuthorityApi.batchDelete(ids)
-  if (response.code === 200) {
-    ElMessage.success('删除成功');
-    records.value = records.value.filter(item => !ids.includes(item.id));
-    selectedRows.value = [];
-    pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await AuthorityApi.batchDelete(ids)
+  records.value = records.value.filter(item => !ids.includes(item.id));
+  selectedRows.value = [];
+  await pageList();
 }
 
 //todo 查询子集权限
@@ -367,9 +337,28 @@ function findPathById(options, id) {
     }
     return false;
   }
-
   pageList(options);
   return path;
+}
+
+const cascaderOptions = ref([]);
+const cascaderProps = {
+  value: 'id',
+  label: 'name',
+  children: 'children',
+  checkStrictly: true,
+};
+
+//请求父级菜单
+async function fetchParentMenus() {
+  const response = await AuthorityApi.findParent();
+  if (response.code === 200) {
+    cascaderOptions.value = response.result;
+    return cascaderOptions.value;
+  } else {
+    ElMessage.error(response.message);
+    return [];
+  }
 }
 
 // 同步参数与输入框的值
@@ -377,6 +366,11 @@ watchEffect(() => {
   params.name = nameInput.value;
   params.current = currentPage.value;
   params.size = pageSize.value;
+});
+
+//默认请求
+onMounted(() => {
+  pageList();
 });
 
 </script>
