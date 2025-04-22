@@ -8,8 +8,8 @@
       <el-input v-model="queryParams.name" @input="pageList" clearable class="searchInput" placeholder="名字"/>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" type="primary" plain>新增</el-button>
-      <el-button @click="batchDelete" type="danger" plain :disabled="selectedRows.length===0">删除</el-button>
+      <el-button @click="addRow" type="primary" :icon="Plus" />
+      <el-button @click="batchDelete" type="danger" :icon="Delete" :disabled="selectedRows.length===0" />
     </div>
     <el-table class="userTable" :data="records" border stripe fit ref="table" @selection-change="handleSelectionChange">
       <el-table-column type="selection" fixed width="45"/>
@@ -19,23 +19,11 @@
       <el-table-column prop="url" label="接口地址" show-overflow-tooltip/>
       <el-table-column prop="sort" label="序号"/>
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
-      <el-table-column label="操作" fixed="right" width="160px">
+      <el-table-column label="操作" fixed="right" width="80px">
         <template v-slot="scope">
           <div class="button-container">
-            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
-            <el-dropdown>
-              <el-button type="primary" plain size="small">更多
-                <el-icon class="el-icon--right">
-                  <arrow-down/>
-                </el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="deleted(scope.row)" :icon="Delete">删除</el-dropdown-item>
-                  <el-dropdown-item @click="findChildren(scope.row)" :icon="Memo">详情</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" link />
+            <el-button @click="deleted(scope.row)" :icon="Delete" type="danger" link />
           </div>
         </template>
       </el-table-column>
@@ -49,31 +37,36 @@
     />
 
     <!-- 新增/编辑对话框 -->
-    <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="35%">
+    <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="40%">
       <el-form ref="addFormRef" :model="authorityForm" :rules="formRules" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="名字" prop="name">
-              <el-input v-model="authorityForm.name" clearable></el-input>
+              <el-input v-model="authorityForm.name" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="标识码" prop="code">
-              <el-input v-model="authorityForm.code" clearable></el-input>
+              <el-input v-model="authorityForm.code" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="接口地址" prop="url">
-              <el-input v-model="authorityForm.url" clearable></el-input>
+              <el-input v-model="authorityForm.url" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="类型" prop="type">
               <el-select v-model="authorityForm.type" placeholder="请选择类型">
-                <el-option label="模块" :value='0'></el-option>
-                <el-option label="菜单" :value='1'></el-option>
-                <el-option label="按钮" :value='2'></el-option>
+                <el-option label="模块" :value='0' />
+                <el-option label="菜单" :value='1' />
+                <el-option label="按钮" :value='2' />
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="序号" prop="sort">
+              <el-input v-model="authorityForm.sort" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="11">
@@ -86,12 +79,8 @@
                   @change="parentChange"
                   :show-all-levels=false
                   clearable
+                  style="width: 100%"
               ></el-cascader>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="序号" prop="sort">
-              <el-input v-model="authorityForm.sort" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -112,12 +101,10 @@
 import CommonLayout from "@/components/base/CommonLayout.vue";
 import {nextTick, onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
-import {ArrowDown, Delete, Edit, Memo} from '@element-plus/icons-vue'
-import {useRouter} from 'vue-router';
+import {Delete, Plus, Edit} from '@element-plus/icons-vue'
 import PaginationComponent from "@/components/util/PageComponent.vue";
 import {AuthorityApi} from "@/baseConfig/system/authority.js";
 
-const router = useRouter();
 const records = ref([]);
 const totalRecords = ref(0); // 总记录数
 const selectedRows = ref([]);
@@ -154,6 +141,7 @@ const formRules = reactive({
   code: [{required: true, message: '编码不能为空', trigger: 'blur'}],
   type: [{required: true, message: '类型不能为空', trigger: 'blur'}],
   url: [{required: true, message: '接口地址不能为空', trigger: 'blur'}],
+  sort: [{required: true, message: '序号不能为空', trigger: 'blur'}],
 })
 
 //复选框
@@ -234,11 +222,6 @@ async function batchDelete() {
   records.value = records.value.filter(item => !ids.includes(item.id));
   selectedRows.value = [];
   await pageList();
-}
-
-//todo 查询子集权限
-function findChildren(row) {
-  router.push('/AuthorityInfo')
 }
 
 //根据id查询

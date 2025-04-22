@@ -14,7 +14,7 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-avatar class="avatar" :src="loginUser?.avatar || defaultAvatar" />
+    <el-avatar class="avatar" :size="30" :src="loginUser?.avatar || defaultAvatar" />
   </div>
 </template>
 
@@ -25,7 +25,7 @@ import {useUserStore} from '@/utils/userStore.js'
 import {storeToRefs} from 'pinia'
 import {ElMessage} from "element-plus";
 import defaultAvatar from "/public/login/login_bg_1.jpg"
-import {ArrowDown, Delete, Memo} from "@element-plus/icons-vue";
+import {ArrowDown} from "@element-plus/icons-vue";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -65,6 +65,6 @@ async function loginOut() {
 }
 
 .avatar {
-  margin-left: 20px;
+  margin-left: 10px;
 }
 </style>

@@ -36,8 +36,8 @@
           <el-col :span="8">
             <el-form-item label="性别" prop="sex">
               <el-select v-model="mySelfInfo.sex" placeholder="请选择性别">
-                <el-option label="男" :value="1"></el-option>
-                <el-option label="女" :value="0"></el-option>
+                <el-option label="男" :value="1" />
+                <el-option label="女" :value="0" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -49,8 +49,8 @@
           <el-col :span="8">
             <el-form-item label="状态" prop="enable">
               <el-select v-model="mySelfInfo.enable" disabled>
-                <el-option label="启用" :value="1"></el-option>
-                <el-option label="禁用" :value="0"></el-option>
+                <el-option label="启用" :value="1" />
+                <el-option label="禁用" :value="0" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -182,7 +182,6 @@ async function changeAvatar(event) {
     }
     await UserApi.editAvatar(body)
     await myself();
-    ElMessage.success('修改成功');
   }
 }
 
@@ -190,7 +189,6 @@ async function changeAvatar(event) {
 async function saveChanges() {
   await UserApi.update(mySelfInfo.value)
   await myself();
-  ElMessage.success('修改成功');
 }
 
 // 修改密码
@@ -200,7 +198,6 @@ async function updatePassword() {
   await UserApi.updatePassword(updatePassWordForm)
   //移除token缓存信息
   userStore.clearUser()
-  ElMessage.success('修改成功，请重新登录');
 }
 
 

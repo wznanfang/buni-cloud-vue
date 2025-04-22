@@ -8,10 +8,10 @@
       <el-input v-model="queryParams.inputSearch" @input="pageList" placeholder="用户名/姓名" clearable class="searchInput"/>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" type="primary" plain>新增</el-button>
-      <el-button @click="batchEnable(true)" type="warning" plain :disabled="selectedRows.length===0">启用</el-button>
-      <el-button @click="batchEnable(false)" type="warning" plain :disabled="selectedRows.length===0">禁用</el-button>
-      <el-button @click="batchDelete" type="danger" plain :disabled="selectedRows.length===0">删除</el-button>
+      <el-button @click="addRow" type="primary" :icon="Plus"/>
+      <el-button @click="batchEnable(true)" type="warning" :icon="Open" :disabled="selectedRows.length===0"/>
+      <el-button @click="batchEnable(false)" type="warning" :icon="TurnOff" :disabled="selectedRows.length===0"/>
+      <el-button @click="batchDelete" type="danger" :icon="Delete" :disabled="selectedRows.length===0"/>
     </div>
 
     <!--  内容展示区域  -->
@@ -25,12 +25,12 @@
       <el-table-column prop="enable" label="状态" :formatter="(row) => ['禁用', '启用'][row.enable]"/>
       <el-table-column prop="admin" label="管理员"/>
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
-      <el-table-column label="操作" fixed="right" width="160px">
+      <el-table-column label="操作" fixed="right" width="100px">
         <template v-slot="scope">
           <div class="button-container">
-            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" link/>
             <el-dropdown>
-              <el-button type="primary" plain size="small">更多
+              <el-button type="primary" link size="small">更多
                 <el-icon class="el-icon--right">
                   <arrow-down/>
                 </el-icon>
@@ -38,8 +38,8 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item @click="deleted(scope.row)" :icon="Delete">删除</el-dropdown-item>
-                  <el-dropdown-item v-if="scope.row.enable === '启用'" @click="enableStatus(scope.row, false)" :icon="Open">禁用</el-dropdown-item>
-                  <el-dropdown-item v-else @click="enableStatus(scope.row, true)" :icon="Open">启用</el-dropdown-item>
+                  <el-dropdown-item v-if="scope.row.enable === 0" @click="enableStatus(scope.row, true)" :icon="Open">启用</el-dropdown-item>
+                  <el-dropdown-item v-else @click="enableStatus(scope.row, false)" :icon="TurnOff">禁用</el-dropdown-item>
                   <el-dropdown-item @click="resetPassword(scope.row)" :icon="Lock">重置密码</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -56,47 +56,47 @@
     />
 
     <!-- 新增/编辑对话框 -->
-    <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="35%" @closed="resetForm">
+    <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="40%" @closed="resetForm">
       <el-form ref="addFormRef" :model="userForm" :rules="formRules" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="11">
             <el-form-item label="用户名" prop="username">
-              <el-input v-model="userForm.username" :disabled="!addMode" clearable></el-input>
+              <el-input v-model="userForm.username" :disabled="!addMode" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11" v-if="addMode">
             <el-form-item label="密码" prop="password">
-              <el-input v-model="userForm.password" type="password" show-password clearable></el-input>
+              <el-input v-model="userForm.password" type="password" show-password clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="姓名" prop="name">
-              <el-input v-model="userForm.name" clearable></el-input>
+              <el-input v-model="userForm.name" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="年龄" prop="age">
-              <el-input v-model="userForm.age" clearable></el-input>
+              <el-input v-model="userForm.age" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="性别" prop="sex">
               <el-select v-model="userForm.sex" placeholder="请选择性别">
-                <el-option label="男" :value="1"></el-option>
-                <el-option label="女" :value="0"></el-option>
+                <el-option label="男" :value="1"/>
+                <el-option label="女" :value="0"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="电话" prop="tel">
-              <el-input v-model="userForm.tel" clearable></el-input>
+              <el-input v-model="userForm.tel" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11">
             <el-form-item label="状态" prop="enable">
               <el-select v-model="userForm.enable" :disabled="!addMode" placeholder="是否启用">
-                <el-option label="启用" :value="1"></el-option>
-                <el-option label="禁用" :value="0"></el-option>
+                <el-option label="启用" :value="1"/>
+                <el-option label="禁用" :value="0"/>
               </el-select>
             </el-form-item>
           </el-col>
@@ -118,7 +118,7 @@
 import CommonLayout from "@/components/base/CommonLayout.vue";
 import {nextTick, onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
-import {ArrowDown, Delete, Edit, Lock, Open} from '@element-plus/icons-vue'
+import {ArrowDown, Delete, Edit, Lock, Open, Plus, TurnOff} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
 import {UserApi} from "@/baseConfig/system/user.js"
 import PaginationComponent from '@/components/util/PageComponent.vue';
