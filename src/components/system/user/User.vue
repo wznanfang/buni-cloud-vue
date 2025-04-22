@@ -5,8 +5,7 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
-      <el-input v-model="queryParams.username" @input="pageList" placeholder="用户名" clearable class="searchInput"/>
-      <el-input v-model="queryParams.name" @input="pageList" placeholder="姓名" clearable class="searchInput"/>
+      <el-input v-model="queryParams.inputSearch" @input="pageList" placeholder="用户名/姓名" clearable class="searchInput"/>
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary">新增</el-button>
@@ -16,7 +15,7 @@
     </div>
 
     <!--  内容展示区域  -->
-    <el-table class="userTable" :data="records" fit stripe ref="table" @selection-change="handleSelectionChange">
+    <el-table class="userTable" :data="records" border fit stripe ref="table" @selection-change="handleSelectionChange">
       <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="username" label="用户名" fixed/>
       <el-table-column prop="name" label="姓名"/>
@@ -29,12 +28,10 @@
       <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
           <div class="button-container">
-            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
             <el-dropdown>
-              <el-button type="primary">更多
-                <el-icon class="el-icon--right">
-                  <arrow-down/>
-                </el-icon>
+              <el-button type="primary" plain size="small">更多
+                <el-icon class="el-icon--right"><arrow-down/></el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -117,7 +114,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {nextTick, onMounted, reactive, ref, watchEffect} from 'vue';
+import {nextTick, onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
 import {ArrowDown, Delete, Edit, Lock, Open} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
@@ -140,8 +137,7 @@ function handleSelectionChange(selected) {
 const queryParams = reactive({
   current: 1,
   size: 10,
-  name: '',
-  username: '',
+  inputSearch: '',
 })
 
 const userForm = ref({

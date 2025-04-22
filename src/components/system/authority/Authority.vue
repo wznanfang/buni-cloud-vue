@@ -11,30 +11,29 @@
       <el-button @click="addRow" type="primary" plain>新增</el-button>
       <el-button @click="batchDelete" type="danger" plain :disabled="selectedRows.length===0">删除</el-button>
     </div>
-    <el-table
-        class="userTable"
-        :data="records"
-        border
-        stripe
-        fit
-        ref="table"
-        :cell-style="{ textAlign: 'center' }"
-        :header-cell-style="{ 'text-align': 'center' }"
-        @selection-change="handleSelectionChange"
-    >
+    <el-table class="userTable" :data="records" border stripe fit ref="table" @selection-change="handleSelectionChange">
       <el-table-column type="selection" fixed width="45"/>
-      <el-table-column prop="name" label="名字" width="150" fixed show-overflow-tooltip/>
-      <el-table-column prop="type" label="类型" width="120"/>
-      <el-table-column prop="code" label="标识码" width="150"/>
-      <el-table-column prop="sort" label="序号" width="120"/>
-      <el-table-column prop="url" label="接口地址" width="270" show-overflow-tooltip/>
-      <el-table-column prop="createTime" label="创建时间" width="200"/>
-      <el-table-column label="操作" fixed="right" width="230">
+      <el-table-column prop="name" label="名字" fixed show-overflow-tooltip/>
+      <el-table-column prop="type" label="类型"/>
+      <el-table-column prop="code" label="标识码" />
+      <el-table-column prop="sort" label="序号" />
+      <el-table-column prop="url" label="接口地址" show-overflow-tooltip/>
+      <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
+      <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
           <div class="button-container">
-            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary"></el-button>
-            <el-button @click="deleted(scope.row)" :icon="Delete" type="danger"></el-button>
-            <el-button @click="findChildren(scope.row)" type="primary">详情</el-button>
+            <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
+            <el-dropdown>
+              <el-button type="primary" plain size="small">更多
+                <el-icon class="el-icon--right"><arrow-down/></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="deleted(scope.row)" :icon="Delete">删除</el-dropdown-item>
+                  <el-dropdown-item @click="findChildren(scope.row)" :icon="Memo">详情</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
         </template>
       </el-table-column>
@@ -113,9 +112,9 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {nextTick, onMounted, reactive, ref, watchEffect} from 'vue';
+import {nextTick, onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
-import {Delete, Edit} from '@element-plus/icons-vue'
+import {ArrowDown, Delete, Edit, Memo} from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router';
 import PaginationComponent from "@/components/util/PageComponent.vue";
 import {AuthorityApi} from "@/baseConfig/system/authority.js";
@@ -315,6 +314,12 @@ onMounted(() => {
 .userTable {
   width: 98%;
   margin-left: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
 
