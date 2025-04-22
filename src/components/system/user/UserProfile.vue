@@ -36,8 +36,8 @@
           <el-col :span="8">
             <el-form-item label="性别" prop="sex">
               <el-select v-model="mySelfInfo.sex" placeholder="请选择性别">
-                <el-option label="男" value="1"></el-option>
-                <el-option label="女" value="0"></el-option>
+                <el-option label="男" :value="1"></el-option>
+                <el-option label="女" :value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -48,7 +48,10 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="状态" prop="enable">
-              <el-input v-model="mySelfInfo.enable" disabled/>
+              <el-select v-model="mySelfInfo.enable" disabled>
+                <el-option label="启用" :value="1"></el-option>
+                <el-option label="禁用" :value="0"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -101,14 +104,16 @@ const userStore = useUserStore()
 
 const {loginUser} = storeToRefs(userStore)
 const formRef = ref() // 表单 Ref
-const mySelfInfo = ref({});
 const avatarUrl = ref('');
 
-const updatePassWordForm = reactive({
-  id: loginUser.value.id,
-  oldPassword: '',
-  newPassword: '',
-  checkPassword: '',
+const mySelfInfo = ref({
+  username: "",
+  password: "",
+  name: "",
+  age: null,
+  sex: 1,
+  tel: "",
+  enable: 0,
 });
 
 const formRules = reactive({
@@ -120,6 +125,13 @@ const formRules = reactive({
   enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
 })
 
+const updatePassWordForm = reactive({
+  id: loginUser.value.id,
+  oldPassword: '',
+  newPassword: '',
+  checkPassword: '',
+});
+
 const updatePasswordRules = reactive({
   oldPassword: [{required: true, message: '旧密码不能为空', trigger: 'blur'}],
   newPassword: [{required: true, message: '新密码不能为空', trigger: 'blur'}],
@@ -127,7 +139,7 @@ const updatePasswordRules = reactive({
     {required: true, message: "请再次输入密码", trigger: "blur"},
     {
       validator: (rule: any, value: string, callback: any) => {
-        if (value !== updatePassWordForm.value.password) {
+        if (value !== updatePassWordForm.newPassword) {
           callback(new Error("两次输入的密码不一致"));
         } else {
           callback();
@@ -146,8 +158,6 @@ onMounted(() => {
 async function myself() {
   const res = await UserApi.getUserInfo(loginUser.value.id);
   mySelfInfo.value = res.result;
-  mySelfInfo.value.enable = mySelfInfo.value.enable === 1 ? '启用' : '禁用';
-  mySelfInfo.value.sex = mySelfInfo.value.sex === 1 ? '男' : '女';
   avatarUrl.value = mySelfInfo.value.avatar;
 }
 
@@ -177,8 +187,6 @@ async function changeAvatar(event) {
 
 // 修改用户信息
 async function saveChanges() {
-  mySelfInfo.value.sex = mySelfInfo.value.sex === '男' || mySelfInfo.value.sex === '1' ? 1 : 0;
-  mySelfInfo.value.enable = mySelfInfo.value.enable === '启用' || mySelfInfo.value.enable === '1' ? 1 : 0;
   await UserApi.update(mySelfInfo.value)
   await myself();
   ElMessage.success('修改成功');
@@ -199,11 +207,6 @@ async function updatePassword() {
 
 
 <style scoped>
-
-.breadcrumb {
-  margin: 30px 0 20px 20px;
-  font-size: 16px;
-}
 
 .user-card {
   position: relative;

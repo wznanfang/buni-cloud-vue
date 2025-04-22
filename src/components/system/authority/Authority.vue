@@ -15,9 +15,9 @@
       <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="name" label="名字" fixed show-overflow-tooltip/>
       <el-table-column prop="type" label="类型"/>
-      <el-table-column prop="code" label="标识码" />
+      <el-table-column prop="code" label="标识码"/>
       <el-table-column prop="url" label="接口地址" show-overflow-tooltip/>
-      <el-table-column prop="sort" label="序号" />
+      <el-table-column prop="sort" label="序号"/>
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
       <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
@@ -25,7 +25,9 @@
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
             <el-dropdown>
               <el-button type="primary" plain size="small">更多
-                <el-icon class="el-icon--right"><arrow-down/></el-icon>
+                <el-icon class="el-icon--right">
+                  <arrow-down/>
+                </el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -68,9 +70,9 @@
           <el-col :span="11">
             <el-form-item label="类型" prop="type">
               <el-select v-model="authorityForm.type" placeholder="请选择类型">
-                <el-option label="模块" value='0'></el-option>
-                <el-option label="菜单" value='1'></el-option>
-                <el-option label="按钮" value='2'></el-option>
+                <el-option label="模块" :value='0'></el-option>
+                <el-option label="菜单" :value='1'></el-option>
+                <el-option label="按钮" :value='2'></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -127,7 +129,7 @@ const authorityForm = ref({
   name: '',
   code: '',
   parentId: 0,
-  type: '',
+  type: 0,
   sort: '',
   url: '',
 });
@@ -203,16 +205,13 @@ async function addAuthority() {
 async function editRow(row) {
   await fetchParentMenus()
   let res = await findById(row.id);
-  let type = res.result.type;
   authorityForm.value = res.result;
-  authorityForm.value.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
   showDialog.value = true;
   addMode.value = false;
 }
 
 // 修改
 async function saveChanges() {
-  authorityForm.value.type = authorityForm.value.type === '模块' ? 0 : authorityForm.type === '菜单' ? 1 : 2;
   await AuthorityApi.update(authorityForm.value);
   showDialog.value = false;
   await pageList();
@@ -273,7 +272,7 @@ const resetForm = () => {
     name: '',
     code: '',
     parentId: 0,
-    type: '',
+    type: 0,
     sort: '',
     url: '',
   };

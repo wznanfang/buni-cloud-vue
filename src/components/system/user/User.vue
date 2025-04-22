@@ -31,7 +31,9 @@
             <el-button @click="editRow(scope.row)" :icon="Edit" type="primary" plain size="small"></el-button>
             <el-dropdown>
               <el-button type="primary" plain size="small">更多
-                <el-icon class="el-icon--right"><arrow-down/></el-icon>
+                <el-icon class="el-icon--right">
+                  <arrow-down/>
+                </el-icon>
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -80,8 +82,8 @@
           <el-col :span="11">
             <el-form-item label="性别" prop="sex">
               <el-select v-model="userForm.sex" placeholder="请选择性别">
-                <el-option label="男" value="1"></el-option>
-                <el-option label="女" value="0"></el-option>
+                <el-option label="男" :value="1"></el-option>
+                <el-option label="女" :value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -92,9 +94,9 @@
           </el-col>
           <el-col :span="11">
             <el-form-item label="状态" prop="enable">
-              <el-select v-model="userForm.enable" placeholder="是否启用">
-                <el-option label="启用" value="1"></el-option>
-                <el-option label="禁用" value="0"></el-option>
+              <el-select v-model="userForm.enable" :disabled="!addMode" placeholder="是否启用">
+                <el-option label="启用" :value="1"></el-option>
+                <el-option label="禁用" :value="0"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -144,10 +146,10 @@ const userForm = ref({
   username: "",
   password: "",
   name: "",
-  age: "",
-  sex: "1",
+  age: null,
+  sex: 1,
   tel: "",
-  enable: "0",
+  enable: 0,
 });
 
 const formRules = reactive({
@@ -208,15 +210,7 @@ async function addUser() {
 // 显示编辑对话框
 async function editRow(row) {
   const res = await findById(String(row.id));
-
-  userForm.value.id = res.result.id;
-  userForm.value.username = res.result.username;
-  userForm.value.name = res.result.name;
-  userForm.value.age = res.result.age;
-  userForm.value.sex = res.result.sex === 1 ? '男' : '女';
-  userForm.value.tel = res.result.tel;
-  userForm.value.enable = res.result.enable === 1 ? '启用' : '禁用';
-  userForm.value.admin = res.result.admin === 1 ? '是' : '否';
+  userForm.value = res.result;
   showAddDialog.value = true;
   addMode.value = false;
 }
@@ -224,9 +218,6 @@ async function editRow(row) {
 // 更改
 async function saveChanges() {
   try {
-    userForm.value.sex = userForm.value.sex === '男' || userForm.value.sex === '1' ? 1 : 0;
-    userForm.value.enable = userForm.value.enable === '启用' || userForm.value.enable === '1' ? 1 : 0;
-    userForm.value.admin = userForm.value.admin === '是' || userForm.value.admin === '1' ? 1 : 0;
     await UserApi.update(userForm.value)
     showAddDialog.value = false;
     await pageList();
@@ -312,10 +303,10 @@ function resetForm() {
     username: "",
     password: "",
     name: "",
-    age: "",
-    sex: "1",
+    age: null,
+    sex: 1,
     tel: "",
-    enable: "0",
+    enable: 0,
   };
   nextTick(() => {
     addFormRef.value?.resetFields();
