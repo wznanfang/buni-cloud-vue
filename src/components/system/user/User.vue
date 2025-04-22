@@ -107,7 +107,7 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showAddDialog = false">取消</el-button>
-      <el-button type="primary" @click="submitForm">{{ addMode ? '新增用户' : '保存修改' }}</el-button>
+      <el-button type="primary" @click="submitForm">确认</el-button>
     </span>
       </template>
     </el-dialog>

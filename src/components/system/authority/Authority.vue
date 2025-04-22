@@ -41,7 +41,6 @@
       </el-table-column>
     </el-table>
 
-
     <PaginationComponent
         :currentPage.sync="currentPage"
         :pageSize.sync="pageSize"
@@ -49,9 +48,9 @@
         @change="pageList"
     />
 
-    <!-- 新增对话框 -->
-    <el-dialog v-model="showDialog" title="新增权限" width="35%">
-      <el-form :model="authorityForm" label-width="100px">
+    <!-- 新增/编辑对话框 -->
+    <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="35%">
+      <el-form ref="addFormRef" :model="authorityForm" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
             <el-form-item label="名字">
@@ -104,67 +103,7 @@
       <template #footer>
     <span class="dialog-footer">
       <el-button @click="showDialog = false">取消</el-button>
-      <el-button type="primary" @click="addAuthority">保存</el-button>
-    </span>
-      </template>
-    </el-dialog>
-
-    <!-- 编辑对话框 -->
-    <el-dialog v-model="showDialog" title="修改权限" width="35%">
-      <el-form :model="authorityForm" label-width="100px">
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="名字">
-              <el-input v-model="authorityForm.name" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="标识码">
-              <el-input v-model="authorityForm.code" clearable></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="类型">
-              <el-select v-model="authorityForm.type" placeholder="请选择类型">
-                <el-option label="模块" value='0'></el-option>
-                <el-option label="菜单" value='1'></el-option>
-                <el-option label="按钮" value='2'></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="父级菜单">
-              <el-cascader
-                  v-model="authorityForm.parentId"
-                  :options="cascaderOptions"
-                  :props="cascaderProps"
-                  placeholder="请选择"
-                  @change="parentChange"
-                  :show-all-levels=false
-                  clearable
-              ></el-cascader>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="15">
-          <el-col :span="11">
-            <el-form-item label="序号">
-              <el-input v-model="authorityForm.sort" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="接口地址">
-              <el-input v-model="authorityForm.url" clearable></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-    <span class="dialog-footer">
-      <el-button @click="showDialog = false">取消</el-button>
-      <el-button type="primary" @click="saveChanges">保存</el-button>
+      <el-button type="primary" @click="submitForm">确认</el-button>
     </span>
       </template>
     </el-dialog>
@@ -175,7 +114,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {onMounted, reactive, ref, watchEffect} from 'vue';
+import {nextTick, onMounted, reactive, ref, watchEffect} from 'vue';
 import {ElMessage} from "element-plus";
 import {Delete, Edit} from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router';
@@ -189,9 +128,11 @@ const currentPage = ref(1); // 当前页
 const pageSize = ref(10); // 每页显示记录数
 const totalRecords = ref(0); // 总记录数
 const showDialog = ref(false);
+const addFormRef = ref(null);
+const addMode = ref(true); // true: 新增模式，false: 编辑模式
 const nameInput = ref('');
 
-const authorityForm = reactive({
+const authorityForm = ref({
   name: '',
   code: '',
   parentId: 0,
@@ -206,6 +147,15 @@ const params = reactive({
   size: 10
 });
 
+const cascaderOptions = ref([]);
+const cascaderProps = {
+  value: 'id',
+  label: 'name',
+  children: 'children',
+  checkStrictly: true,
+  emitPath: false,
+};
+
 //复选框
 function handleSelectionChange(selected) {
   selectedRows.value = selected;
@@ -215,19 +165,37 @@ function parentChange(selectedValues) {
   authorityForm.parentId = selectedValues[selectedValues.length - 1];
 }
 
-//新增
-function addRow() {
-  authorityForm.name = '';
-  authorityForm.code = '';
-  authorityForm.parentId = 0;
-  authorityForm.type = '';
-  authorityForm.sort = '';
-  authorityForm.url = '';
-  fetchParentMenus();
-  showDialog.value = true;
+/**
+ * 提交表单
+ */
+async function submitForm() {
+  if (!addFormRef.value) {
+    return;
+  }
+  try {
+    await addFormRef.value.validate(); // 校验表单数据
+    if (addMode.value) {
+      await addAuthority();
+    } else {
+      await saveChanges();
+    }
+  } catch (error) {
+    console.error("表单提交错误:", error);
+  }
 }
 
+//新增
+const addRow = async () => {
+  showDialog.value = true;
+  addMode.value = true;
+  resetForm();
+  await fetchParentMenus();
+};
+
 async function addAuthority() {
+  if (!addFormRef.value) {
+    return;
+  }
   await AuthorityApi.save(authorityForm)
   showDialog.value = false;
   await pageList();
@@ -237,33 +205,24 @@ async function addAuthority() {
 async function editRow(row) {
   await fetchParentMenus()
   let res = await findById(row.id);
-  console.log(res.result)
   let type = res.result.type;
-  authorityForm.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
-  authorityForm.id = res.result.id;
-  authorityForm.name = res.result.name;
-  authorityForm.code = res.result.code;
-  authorityForm.sort = res.result.sort;
-  authorityForm.url = res.result.url;
-  authorityForm.parentId = res.result.parentId;
+  authorityForm.value.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
+  authorityForm.value.id = res.result.id;
+  authorityForm.value.name = res.result.name;
+  authorityForm.value.code = res.result.code;
+  authorityForm.value.sort = res.result.sort;
+  authorityForm.value.url = res.result.url;
+  authorityForm.value.parentId = res.result.parentId;
   showDialog.value = true;
+  addMode.value = false;
 }
 
-// 保存更改
+// 修改
 async function saveChanges() {
-  try {
-    authorityForm.type = authorityForm.type === '模块' ? 0 : authorityForm.type === '菜单' ? 1 : 2;
-    const response = await AuthorityApi.update(authorityForm);
-    if (response.code === 200) {
-      ElMessage.success('修改成功');
-    } else {
-      ElMessage.error(response.message);
-    }
-    showDialog.value = false;
-    await pageList();
-  } catch (error) {
-    console.error(error);
-  }
+  authorityForm.value.type = authorityForm.value.type === '模块' ? 0 : authorityForm.type === '菜单' ? 1 : 2;
+  await AuthorityApi.update(authorityForm.value);
+  showDialog.value = false;
+  await pageList();
 }
 
 //删除
@@ -275,7 +234,6 @@ async function deleted(row) {
   } else {
     ElMessage.error(response.message);
   }
-
 }
 
 //批量删除
@@ -298,12 +256,7 @@ function findChildren(row) {
 
 //根据id查询
 async function findById(id) {
-  const response = await AuthorityApi.findById(id);
-  if (response.code === 200) {
-    return response;
-  } else {
-    ElMessage.error(response.message);
-  }
+  return await AuthorityApi.findById(id);
 }
 
 //分页查询
@@ -317,49 +270,29 @@ async function pageList() {
 }
 
 
-// 递归查找路径
-function findPathById(options, id) {
-  let path = [];
-
-  function pageList(options) {
-    for (const option of options) {
-      if (option.id === id.toString()) {
-        path = [option.id];
-        return true;
-      }
-      if (option.children) {
-        const found = pageList(option.children);
-        if (found) {
-          path = [option.id, ...path];
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-  pageList(options);
-  return path;
-}
-
-const cascaderOptions = ref([]);
-const cascaderProps = {
-  value: 'id',
-  label: 'name',
-  children: 'children',
-  checkStrictly: true,
-};
-
 //请求父级菜单
 async function fetchParentMenus() {
   const response = await AuthorityApi.findParent();
-  if (response.code === 200) {
-    cascaderOptions.value = response.result;
-    return cascaderOptions.value;
-  } else {
-    ElMessage.error(response.message);
-    return [];
-  }
+  cascaderOptions.value = response.result;
+  return cascaderOptions.value;
 }
+
+/**
+ * 重置表单
+ */
+const resetForm = () => {
+  authorityForm.value = {
+    name: '',
+    code: '',
+    parentId: 0,
+    type: '',
+    sort: '',
+    url: '',
+  };
+  nextTick(() => {
+    addFormRef.value?.resetFields();
+  });
+};
 
 // 同步参数与输入框的值
 watchEffect(() => {
