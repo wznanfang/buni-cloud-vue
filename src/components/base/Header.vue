@@ -12,7 +12,7 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-avatar class="avatar" :src="loginUser?.avatar"/>
+    <el-avatar class="avatar" :src="loginUser?.avatar || defaultAvatar" />
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import {AuthApi} from '@/baseConfig/system/auth.js'
 import {useUserStore} from '@/utils/userStore.js'
 import {storeToRefs} from 'pinia'
 import {ElMessage} from "element-plus";
+import defaultAvatar from "/public/login/login_bg_1.jpg"
 
 const router = useRouter()
 const userStore = useUserStore()

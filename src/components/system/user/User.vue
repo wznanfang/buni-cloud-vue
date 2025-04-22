@@ -55,7 +55,7 @@
 
     <!-- 新增/编辑对话框 -->
     <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="35%" @closed="resetForm">
-      <el-form ref="addFormRef" :model="userForm" label-width="100px">
+      <el-form ref="addFormRef" :model="userForm" :rules="formRules" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="11">
             <el-form-item label="用户名" prop="username">
@@ -150,6 +150,14 @@ const userForm = ref({
   enable: "0",
 });
 
+const formRules = reactive({
+  username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
+  name: [{required: true, message: '名字不能为空', trigger: 'blur'}],
+  password: [{required: true, message: '密码不能为空', trigger: 'blur'}],
+  tel: [{required: true, message: '电话不能为空', trigger: 'blur'}],
+  enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
+})
+
 /**
  * 显示新增对话框
  */
@@ -200,6 +208,7 @@ async function addUser() {
 // 显示编辑对话框
 async function editRow(row) {
   const res = await findById(String(row.id));
+
   userForm.value.id = res.result.id;
   userForm.value.username = res.result.username;
   userForm.value.name = res.result.name;

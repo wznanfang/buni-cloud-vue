@@ -82,7 +82,7 @@
         </el-row>
       </el-form>
       <div class="updatePassword-container">
-        <el-button @click="updatePassword" class="updatePasswordButton" type="danger">修改密码</el-button>
+        <el-button @click="updatePassword" class="updatePasswordButton" type="danger">修改</el-button>
       </div>
     </el-card>
   </CommonLayout>
@@ -118,7 +118,6 @@ const formRules = reactive({
   sex: [{required: true, message: '性别不能为空', trigger: 'blur'}],
   tel: [{required: true, message: '电话不能为空', trigger: 'blur'}],
   enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
-
 })
 
 const updatePasswordRules = reactive({

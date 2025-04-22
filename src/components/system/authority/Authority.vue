@@ -16,8 +16,8 @@
       <el-table-column prop="name" label="名字" fixed show-overflow-tooltip/>
       <el-table-column prop="type" label="类型"/>
       <el-table-column prop="code" label="标识码" />
-      <el-table-column prop="sort" label="序号" />
       <el-table-column prop="url" label="接口地址" show-overflow-tooltip/>
+      <el-table-column prop="sort" label="序号" />
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
       <el-table-column label="操作" fixed="right" width="160px">
         <template v-slot="scope">
@@ -48,22 +48,25 @@
 
     <!-- 新增/编辑对话框 -->
     <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="35%">
-      <el-form ref="addFormRef" :model="authorityForm" label-width="100px">
+      <el-form ref="addFormRef" :model="authorityForm" :rules="formRules" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="名字">
+            <el-form-item label="名字" prop="name">
               <el-input v-model="authorityForm.name" clearable></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="标识码">
+            <el-form-item label="标识码" prop="code">
               <el-input v-model="authorityForm.code" clearable></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="类型">
+            <el-form-item label="接口地址" prop="url">
+              <el-input v-model="authorityForm.url" clearable></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item label="类型" prop="type">
               <el-select v-model="authorityForm.type" placeholder="请选择类型">
                 <el-option label="模块" value='0'></el-option>
                 <el-option label="菜单" value='1'></el-option>
@@ -72,7 +75,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="父级菜单">
+            <el-form-item label="父级菜单" prop="parentId">
               <el-cascader
                   v-model="authorityForm.parentId"
                   :options="cascaderOptions"
@@ -84,16 +87,9 @@
               ></el-cascader>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="15">
           <el-col :span="11">
-            <el-form-item label="序号">
+            <el-form-item label="序号" prop="sort">
               <el-input v-model="authorityForm.sort" clearable></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="接口地址">
-              <el-input v-model="authorityForm.url" clearable></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -112,7 +108,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {nextTick, onMounted, reactive, ref, watch} from 'vue';
+import {nextTick, onMounted, reactive, ref} from 'vue';
 import {ElMessage} from "element-plus";
 import {ArrowDown, Delete, Edit, Memo} from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router';
@@ -150,6 +146,13 @@ const cascaderProps = {
   checkStrictly: true,
   emitPath: false,
 };
+
+const formRules = reactive({
+  name: [{required: true, message: '名字不能为空', trigger: 'blur'}],
+  code: [{required: true, message: '编码不能为空', trigger: 'blur'}],
+  type: [{required: true, message: '类型不能为空', trigger: 'blur'}],
+  url: [{required: true, message: '接口地址不能为空', trigger: 'blur'}],
+})
 
 //复选框
 function handleSelectionChange(selected) {
@@ -201,13 +204,8 @@ async function editRow(row) {
   await fetchParentMenus()
   let res = await findById(row.id);
   let type = res.result.type;
+  authorityForm.value = res.result;
   authorityForm.value.type = type === 0 ? "模块" : type === 1 ? "菜单" : "按钮";
-  authorityForm.value.id = res.result.id;
-  authorityForm.value.name = res.result.name;
-  authorityForm.value.code = res.result.code;
-  authorityForm.value.sort = res.result.sort;
-  authorityForm.value.url = res.result.url;
-  authorityForm.value.parentId = res.result.parentId;
   showDialog.value = true;
   addMode.value = false;
 }
