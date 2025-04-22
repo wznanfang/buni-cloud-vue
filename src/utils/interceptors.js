@@ -26,35 +26,49 @@ service.interceptors.request.use(
     }
 )
 
-// 响应拦截器：统一处理错误信息
+// axios 响应拦截器
 service.interceptors.response.use(
-    response => {
-        // 确保 response.data 存在，并且 code 不是 200
-        if (!response.data || response.data.code !== 200) {
-            let errorMessage = response.data?.message || '请求失败'
-            // 如果有 errors 详情，拼接错误信息
-            if (response.data?.errors && Array.isArray(response.data.errors)) {
-                errorMessage += '：' + response.data.errors.map(err => err.message || err).join('，')
-            }
-            ElMessage.error(errorMessage) // 弹框提示
-            return Promise.reject(response.data)
+    (response) => {
+        const { data, config } = response;
+        // 1. 业务逻辑失败（code !== 200）
+        if (!data || data.code !== 200) {
+            const errorMessage = formatErrorMessage(data);
+            ElMessage.error(errorMessage); // 所有失败请求均提示
+            return Promise.reject(data);
         }
-        return response.data
-    }, error => {
-        console.error('请求错误:', error)
-        let errorMessage = '服务器错误，请稍后重试'
-        if (error.response && error.response.data) {
-            const resData = error.response.data
-            errorMessage = resData.message || errorMessage
-            // 进一步解析 errors 详细信息
-            if (resData.errors && Array.isArray(resData.errors)) {
-                errorMessage += '：' + resData.errors.map(err => err.message || err).join('，')
-            }
+        // 2. 成功请求：非 GET 方法时提示成功
+        if (config.method?.toLowerCase() !== 'get') {
+            const actionName = getActionName(config.method, config.url);
+            ElMessage.success(`${actionName}成功`); // 示例："删除成功"
         }
-        ElMessage.error(errorMessage) // 弹框提示错误
-        return Promise.reject(error)
+        return data;
+    }, (error) => {
+        // 3. 网络或服务器错误（统一处理）
+        ElMessage.error(formatErrorMessage(error.response?.data) || '请求失败');
+        return Promise.reject(error);
     }
-)
+);
+
+// 错误信息格式化（复用）
+function formatErrorMessage(data) {
+    if (!data) return '未知错误';
+    let message = data.message || '操作失败';
+    if (data.errors?.length) {
+        message += '：' + data.errors.map(e => e.message || e).join('，');
+    }
+    return message;
+}
+
+// 根据请求方法生成操作名称（可选）
+function getActionName(method, url) {
+    const actionMap = {
+        post: '新增',
+        put: '编辑',
+        patch: '更新',
+        delete: '删除'
+    };
+    return actionMap[method.toLowerCase()] || '操作';
+}
 
 
 export default service

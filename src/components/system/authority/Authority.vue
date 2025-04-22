@@ -5,8 +5,7 @@
       <el-breadcrumb-item>权限管理</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="flex gap-4 mb-4">
-      <el-input v-model="nameInput" clearable class="searchInput" placeholder="名字"/>
-      <el-button @click="pageList" class="searchButton" type="primary" plain>查询</el-button>
+      <el-input v-model="queryParams.name" @input="pageList" clearable class="searchInput" placeholder="名字"/>
     </div>
     <div class="flex justify-end mb-4">
       <el-button @click="addRow" type="primary" plain>新增</el-button>
@@ -130,7 +129,6 @@ const totalRecords = ref(0); // 总记录数
 const showDialog = ref(false);
 const addFormRef = ref(null);
 const addMode = ref(true); // true: 新增模式，false: 编辑模式
-const nameInput = ref('');
 
 const authorityForm = ref({
   name: '',
@@ -141,7 +139,7 @@ const authorityForm = ref({
   url: '',
 });
 
-const params = reactive({
+const queryParams = reactive({
   name: '',
   current: 1,
   size: 10
@@ -196,7 +194,7 @@ async function addAuthority() {
   if (!addFormRef.value) {
     return;
   }
-  await AuthorityApi.save(authorityForm)
+  await AuthorityApi.save(authorityForm.value)
   showDialog.value = false;
   await pageList();
 }
@@ -227,13 +225,8 @@ async function saveChanges() {
 
 //删除
 async function deleted(row) {
-  let response = await AuthorityApi.delete(row.id);
-  if (response.code === 200) {
-    ElMessage.success('删除成功');
-    pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await AuthorityApi.delete(row.id);
+  await pageList();
 }
 
 //批量删除
@@ -261,7 +254,7 @@ async function findById(id) {
 
 //分页查询
 async function pageList() {
-  const res = await AuthorityApi.getPage(params);
+  const res = await AuthorityApi.getPage(queryParams);
   records.value = res.result.records;
   totalRecords.value = res.result.total;
   records.value.forEach(item => {
@@ -293,13 +286,6 @@ const resetForm = () => {
     addFormRef.value?.resetFields();
   });
 };
-
-// 同步参数与输入框的值
-watchEffect(() => {
-  params.name = nameInput.value;
-  params.current = currentPage.value;
-  params.size = pageSize.value;
-});
 
 //默认请求
 onMounted(() => {

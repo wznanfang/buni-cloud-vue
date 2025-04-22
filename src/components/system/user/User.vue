@@ -15,9 +15,8 @@
       <el-button @click="batchDelete" type="danger" :disabled="selectedRows.length===0">删除</el-button>
     </div>
 
-<!--  内容展示区域  -->
-    <el-table class="userTable" :data="records" fit stripe ref="table" @selection-change="handleSelectionChange"
-    >
+    <!--  内容展示区域  -->
+    <el-table class="userTable" :data="records" fit stripe ref="table" @selection-change="handleSelectionChange">
       <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="username" label="用户名" fixed/>
       <el-table-column prop="name" label="姓名"/>
@@ -118,9 +117,9 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {onMounted, reactive, ref} from 'vue';
+import {nextTick, onMounted, reactive, ref, watchEffect} from 'vue';
 import {ElMessage} from "element-plus";
-import {ArrowDown, Delete, Edit, Lock,Open} from '@element-plus/icons-vue'
+import {ArrowDown, Delete, Edit, Lock, Open} from '@element-plus/icons-vue'
 import {Encrypt} from '@/utils/secret.js';
 import {UserApi} from "@/baseConfig/system/user.js"
 import PaginationComponent from '@/components/util/PageComponent.vue';
@@ -138,17 +137,13 @@ function handleSelectionChange(selected) {
   selectedRows.value = selected;
 }
 
-//默认请求
-onMounted(() => {
-  pageList();
-});
-
 const queryParams = reactive({
   current: 1,
   size: 10,
-  name: undefined,
-  username: undefined,
+  name: '',
+  username: '',
 })
+
 const userForm = ref({
   username: "",
   password: "",
@@ -166,24 +161,6 @@ function addRow() {
   showAddDialog.value = true;
   addMode.value = true;
   resetForm();
-}
-
-/**
- * 重置表单
- */
-function resetForm() {
-  if (addFormRef.value) {
-    addFormRef.value.resetFields(); // 清除表单验证
-  }
-  userForm.value = {
-    username: "",
-    password: "",
-    name: "",
-    age: "",
-    sex: "1",
-    tel: "",
-    enable: "0",
-  };
 }
 
 /**
@@ -212,46 +189,31 @@ async function addUser() {
   if (!addFormRef.value) {
     return;
   }
-  try {
-    // 校验表单数据
-    await addFormRef.value.validate();
-    const payload = {
-      ...userForm.value,
-      password: Encrypt(userForm.value.password),
-    };
-    // 发送请求
-    const res = await UserApi.save(payload);
-    if (res.code === 200) {
-      ElMessage.success("添加成功");
-      showAddDialog.value = false;
-      resetForm();
-      // 刷新用户列表
-      await pageList();
-    } else {
-      ElMessage.error(res.message);
-    }
-  } catch (error) {
-    console.error("表单提交错误:", error);
-  }
+  // 校验表单数据
+  await addFormRef.value.validate();
+  const payload = {
+    ...userForm.value,
+    password: Encrypt(userForm.value.password),
+  };
+  await UserApi.save(payload);
+  showAddDialog.value = false;
+  resetForm();
+  await pageList();
 }
 
 // 显示编辑对话框
 async function editRow(row) {
-  try {
-    const res = await findById(String(row.id));
-    userForm.value.id = res.result.id;
-    userForm.value.username = res.result.username;
-    userForm.value.name = res.result.name;
-    userForm.value.age = res.result.age;
-    userForm.value.sex = res.result.sex === 1 ? '男' : '女';
-    userForm.value.tel = res.result.tel;
-    userForm.value.enable = res.result.enable === 1 ? '启用' : '禁用';
-    userForm.value.admin = res.result.admin === 1 ? '是' : '否';
-    showAddDialog.value = true;
-    addMode.value = false;
-  } catch (error) {
-    ElMessage.error('查询失败，请稍后再试');
-  }
+  const res = await findById(String(row.id));
+  userForm.value.id = res.result.id;
+  userForm.value.username = res.result.username;
+  userForm.value.name = res.result.name;
+  userForm.value.age = res.result.age;
+  userForm.value.sex = res.result.sex === 1 ? '男' : '女';
+  userForm.value.tel = res.result.tel;
+  userForm.value.enable = res.result.enable === 1 ? '启用' : '禁用';
+  userForm.value.admin = res.result.admin === 1 ? '是' : '否';
+  showAddDialog.value = true;
+  addMode.value = false;
 }
 
 // 更改
@@ -260,12 +222,7 @@ async function saveChanges() {
     userForm.value.sex = userForm.value.sex === '男' || userForm.value.sex === '1' ? 1 : 0;
     userForm.value.enable = userForm.value.enable === '启用' || userForm.value.enable === '1' ? 1 : 0;
     userForm.value.admin = userForm.value.admin === '是' || userForm.value.admin === '1' ? 1 : 0;
-    const res = await UserApi.update(userForm.value)
-    if (res.code === 200) {
-      ElMessage.success('修改成功');
-    } else {
-      ElMessage.error(res.message);
-    }
+    await UserApi.update(userForm.value)
     showAddDialog.value = false;
     await pageList();
   } catch (error) {
@@ -275,13 +232,8 @@ async function saveChanges() {
 
 //删除
 async function deleted(row) {
-  const response = await UserApi.delete(row.id)
-  if (response.code === 200) {
-    ElMessage.success('删除成功');
-    await pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await UserApi.delete(row.id)
+  await pageList();
 }
 
 // 启用-禁用
@@ -291,23 +243,13 @@ async function enableStatus(row, enable) {
     enable: enable ? 1 : 0
   };
   console.log(data);
-  const response = await UserApi.enableStatus(data)
-  if (response.code === 200) {
-    ElMessage.success('操作成功');
-    await pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await UserApi.enableStatus(data)
+  await pageList();
 }
 
 //重置密码
 async function resetPassword(row) {
-  const response = await UserApi.resetPassword(row.id)
-  if (response.code === 200) {
-    ElMessage.success('重置成功');
-  } else {
-    ElMessage.error(response.message);
-  }
+  await UserApi.resetPassword(row.id)
 }
 
 //批量删除
@@ -317,15 +259,10 @@ async function batchDelete() {
     return;
   }
   const ids = selectedRows.value.map(row => row.id);
-  const response = await UserApi.batchDelete(ids)
-  if (response.code === 200) {
-    ElMessage.success('删除成功');
-    records.value = records.value.filter(item => !ids.includes(item.id));
-    selectedRows.value = [];
-    await pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await UserApi.batchDelete(ids)
+  records.value = records.value.filter(item => !ids.includes(item.id));
+  selectedRows.value = [];
+  await pageList();
 }
 
 //批量启用-禁用
@@ -339,42 +276,51 @@ async function batchEnable(enable) {
     idVOs: {ids},
     enable: enable ? 1 : 0
   };
-  const response = await UserApi.batchEnable(data)
-  if (response.code === 200) {
-    ElMessage.success('操作成功');
-    records.value = records.value.filter(item => !ids.includes(item.id));
-    selectedRows.value = [];
-    await pageList();
-  } else {
-    ElMessage.error(response.message);
-  }
+  await UserApi.batchEnable(data)
+  records.value = records.value.filter(item => !ids.includes(item.id));
+  selectedRows.value = [];
+  await pageList();
 }
 
 //根据id查询
 async function findById(id) {
-  const response = await UserApi.getUserInfo(id)
-  if (response.code === 200) {
-    return response;
-  } else {
-    ElMessage.error(response.message);
-  }
+  return await UserApi.getUserInfo(id);
 }
 
 //分页查询
 async function pageList() {
   const response = await UserApi.getPage(queryParams)
-  if (response.code === 200) {
-    records.value = response.result.records;
-    totalRecords.value = response.result.total;
-    records.value.forEach(item => {
-      item.sex = item.sex === 1 ? '男' : '女';
-      item.enable = item.enable === 1 ? '启用' : '禁用';
-      item.admin = item.admin === 1 ? '是' : '否';
-    })
-  } else {
-    ElMessage.error(response.message);
-  }
+  records.value = response.result.records;
+  totalRecords.value = response.result.total;
+  records.value.forEach(item => {
+    item.sex = item.sex === 1 ? '男' : '女';
+    item.enable = item.enable === 1 ? '启用' : '禁用';
+    item.admin = item.admin === 1 ? '是' : '否';
+  })
 }
+
+/**
+ * 重置表单
+ */
+function resetForm() {
+  userForm.value = {
+    username: "",
+    password: "",
+    name: "",
+    age: "",
+    sex: "1",
+    tel: "",
+    enable: "0",
+  };
+  nextTick(() => {
+    addFormRef.value?.resetFields();
+  });
+}
+
+//默认请求
+onMounted(() => {
+  pageList();
+});
 
 </script>
 
