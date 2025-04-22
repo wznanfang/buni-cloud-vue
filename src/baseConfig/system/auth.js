@@ -9,7 +9,7 @@ export const AuthApi = {
     },
 
     // 退出登录
-    logout: async (router) => {
+    logout: async () => {
         return service.post('/user/v1/loginOut');
     },
 
