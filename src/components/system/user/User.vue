@@ -47,10 +47,10 @@
       </el-table-column>
     </el-table>
     <PaginationComponent
-        :currentPage.sync="queryParams.current"
-        :pageSize.sync="queryParams.size"
-        :totalRecords="totalRecords"
-        @change="pageList"
+        v-model:current-page="queryParams.current"
+        v-model:page-size="queryParams.size"
+        :total="totalRecords"
+        @page-change="pageList"
     />
 
     <!-- 新增/编辑对话框 -->
@@ -123,8 +123,8 @@ import PaginationComponent from '@/components/util/PageComponent.vue';
 
 //变量
 const records = ref([]);
-const selectedRows = ref([]);
 const totalRecords = ref(0); // 总记录数
+const selectedRows = ref([]);
 const showAddDialog = ref(false);
 const addFormRef = ref(null);
 const addMode = ref(true); // true: 新增模式，false: 编辑模式

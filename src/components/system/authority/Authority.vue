@@ -40,10 +40,10 @@
     </el-table>
 
     <PaginationComponent
-        :currentPage.sync="currentPage"
-        :pageSize.sync="pageSize"
-        :totalRecords="totalRecords"
-        @change="pageList"
+        v-model:current-page="queryParams.current"
+        v-model:page-size="queryParams.size"
+        :total="totalRecords"
+        @page-change="pageList"
     />
 
     <!-- 新增/编辑对话框 -->
@@ -112,7 +112,7 @@
 <script setup>
 //引入
 import CommonLayout from "@/components/base/CommonLayout.vue";
-import {nextTick, onMounted, reactive, ref} from 'vue';
+import {nextTick, onMounted, reactive, ref, watch} from 'vue';
 import {ElMessage} from "element-plus";
 import {ArrowDown, Delete, Edit, Memo} from '@element-plus/icons-vue'
 import {useRouter} from 'vue-router';
@@ -121,10 +121,8 @@ import {AuthorityApi} from "@/baseConfig/system/authority.js";
 
 const router = useRouter();
 const records = ref([]);
-const selectedRows = ref([]);
-const currentPage = ref(1); // 当前页
-const pageSize = ref(10); // 每页显示记录数
 const totalRecords = ref(0); // 总记录数
+const selectedRows = ref([]);
 const showDialog = ref(false);
 const addFormRef = ref(null);
 const addMode = ref(true); // true: 新增模式，false: 编辑模式
@@ -139,9 +137,9 @@ const authorityForm = ref({
 });
 
 const queryParams = reactive({
-  name: '',
   current: 1,
-  size: 10
+  size: 10,
+  name: '',
 });
 
 const cascaderOptions = ref([]);
