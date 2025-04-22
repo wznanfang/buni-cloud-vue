@@ -4,7 +4,11 @@
   </div>
   <div class="header-container">
     <el-dropdown>
-      <div class="el-dropdown-link">{{ loginUser?.name }}</div>
+      <div class="el-dropdown-link">{{ loginUser?.name }}
+        <el-icon class="el-icon--right">
+          <arrow-down/>
+        </el-icon>
+      </div>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="myself">个人中心</el-dropdown-item>
@@ -23,6 +27,7 @@ import {useUserStore} from '@/utils/userStore.js'
 import {storeToRefs} from 'pinia'
 import {ElMessage} from "element-plus";
 import defaultAvatar from "/public/login/login_bg_1.jpg"
+import {ArrowDown, Delete, Memo} from "@element-plus/icons-vue";
 
 const router = useRouter()
 const userStore = useUserStore()

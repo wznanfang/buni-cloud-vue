@@ -57,5 +57,10 @@ export const UserApi = {
         return await service.put(`/user/v1/user/avatar`, formData)
     },
 
+    //获取统计数据
+    statistics: async (params) => {
+        return await service.get(`/user/v1/user/statistics`, {params})
+    },
+
 
 }
