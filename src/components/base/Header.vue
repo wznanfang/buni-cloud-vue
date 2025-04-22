@@ -1,10 +1,8 @@
 <template>
-  <div class="logo">
-    <span>不逆平台</span>
-  </div>
+  <div style="font-size: 16px">不逆平台</div>
   <div class="header-container">
     <el-dropdown>
-      <div class="el-dropdown-link">{{ loginUser?.name }}
+      <div class="el-dropdown-link" style="font-size: 14px">{{ loginUser?.name }}
         <el-icon class="el-icon--right">
           <arrow-down/>
         </el-icon>
