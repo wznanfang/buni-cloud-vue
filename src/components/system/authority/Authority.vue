@@ -14,7 +14,7 @@
     <el-table class="userTable" :data="records" border stripe fit ref="table" @selection-change="handleSelectionChange">
       <el-table-column type="selection" fixed width="45"/>
       <el-table-column prop="name" label="名字" fixed show-overflow-tooltip/>
-      <el-table-column prop="type" label="类型"/>
+      <el-table-column prop="type" label="类型" :formatter="(row) => ['模块', '菜单', '按钮'][row.type]"/>
       <el-table-column prop="code" label="标识码"/>
       <el-table-column prop="url" label="接口地址" show-overflow-tooltip/>
       <el-table-column prop="sort" label="序号"/>
@@ -251,9 +251,6 @@ async function pageList() {
   const res = await AuthorityApi.getPage(queryParams);
   records.value = res.result.records;
   totalRecords.value = res.result.total;
-  records.value.forEach(item => {
-    item.type = item.type === 0 ? "模块" : item.type === 1 ? "菜单" : "按钮";
-  })
 }
 
 

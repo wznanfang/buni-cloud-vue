@@ -1,6 +1,6 @@
 <template>
   <div class="logo">
-    <span>不逆</span>
+    <span>不逆平台</span>
   </div>
   <div class="header-container">
     <el-dropdown>

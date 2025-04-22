@@ -5,7 +5,7 @@
         <h2>个人中心</h2>
       </div>
       <div class="avatar-icon">
-        <el-avatar class="myself-avatar" @click="selectAvatar" :src="avatarUrl"/>
+        <el-avatar class="myself-avatar" @click="selectAvatar" :src="avatarUrl || defaultAvatar"/>
         <input ref="fileInput" type="file" accept="image/*" style="display: none;" @change="changeAvatar"/>
       </div>
       <h3>个人信息</h3>
@@ -99,6 +99,7 @@ import {UserApi} from "@/baseConfig/system/user.js";
 import {SystemFileApi} from "@/baseConfig/system/systemFile.js";
 import {useUserStore} from '@/utils/userStore.js'
 import {storeToRefs} from "pinia";
+import defaultAvatar from "/public/login/login_bg_1.jpg"
 
 const userStore = useUserStore()
 

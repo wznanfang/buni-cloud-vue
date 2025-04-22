@@ -8,10 +8,10 @@
       <el-input v-model="queryParams.inputSearch" @input="pageList" placeholder="用户名/姓名" clearable class="searchInput"/>
     </div>
     <div class="flex justify-end mb-4">
-      <el-button @click="addRow" type="primary">新增</el-button>
-      <el-button @click="batchEnable(true)" type="warning" :disabled="selectedRows.length===0">启用</el-button>
-      <el-button @click="batchEnable(false)" type="warning" :disabled="selectedRows.length===0">禁用</el-button>
-      <el-button @click="batchDelete" type="danger" :disabled="selectedRows.length===0">删除</el-button>
+      <el-button @click="addRow" type="primary" plain>新增</el-button>
+      <el-button @click="batchEnable(true)" type="warning" plain :disabled="selectedRows.length===0">启用</el-button>
+      <el-button @click="batchEnable(false)" type="warning" plain :disabled="selectedRows.length===0">禁用</el-button>
+      <el-button @click="batchDelete" type="danger" plain :disabled="selectedRows.length===0">删除</el-button>
     </div>
 
     <!--  内容展示区域  -->
@@ -20,9 +20,9 @@
       <el-table-column prop="username" label="用户名" fixed/>
       <el-table-column prop="name" label="姓名"/>
       <el-table-column prop="age" label="年龄"/>
-      <el-table-column prop="sex" label="性别"/>
+      <el-table-column prop="sex" label="性别" :formatter="(row) => ['女', '男'][row.sex]"/>
       <el-table-column prop="tel" label="电话"/>
-      <el-table-column prop="enable" label="状态"/>
+      <el-table-column prop="enable" label="状态" :formatter="(row) => ['禁用', '启用'][row.enable]"/>
       <el-table-column prop="admin" label="管理员"/>
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
       <el-table-column label="操作" fixed="right" width="160px">
@@ -288,11 +288,6 @@ async function pageList() {
   const response = await UserApi.getPage(queryParams)
   records.value = response.result.records;
   totalRecords.value = response.result.total;
-  records.value.forEach(item => {
-    item.sex = item.sex === 1 ? '男' : '女';
-    item.enable = item.enable === 1 ? '启用' : '禁用';
-    item.admin = item.admin === 1 ? '是' : '否';
-  })
 }
 
 /**
