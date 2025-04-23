@@ -37,7 +37,7 @@
     />
 
     <!-- 新增/编辑对话框 -->
-    <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="40%">
+    <el-dialog v-model="showDialog" :title="addMode ? '新增权限' : '编辑权限'" width="35%">
       <el-form ref="addFormRef" :model="authorityForm" :rules="formRules" label-width="100px">
         <el-row :gutter="15">
           <el-col :span="11">

@@ -1,6 +1,8 @@
 import axios from 'axios'
 import {ElMessage} from 'element-plus'
-import {API_BASE_URL, BEARER,AUTH_TOKEN} from '@/config.js'
+import {API_BASE_URL, BEARER, AUTH_TOKEN} from '@/config.js'
+import router from '@/router'
+
 
 // 创建 Axios 实例
 const service = axios.create({
@@ -29,7 +31,8 @@ service.interceptors.request.use(
 // axios 响应拦截器
 service.interceptors.response.use(
     (response) => {
-        const { data, config } = response;
+        console.log('响应拦截器触发', response);
+        const {data, config} = response;
         // 1. 业务逻辑失败（code !== 200）
         if (!data || data.code !== 200) {
             const errorMessage = formatErrorMessage(data);
@@ -44,6 +47,11 @@ service.interceptors.response.use(
         return data;
     }, (error) => {
         // 3. 网络或服务器错误（统一处理）
+        if (error.response.data.code === 401) {
+            router.push('/Login')
+            ElMessage.error('登录已过期，请重新登录');
+            return Promise.reject(error);
+        }
         ElMessage.error(formatErrorMessage(error.response?.data) || '请求失败');
         return Promise.reject(error);
     }

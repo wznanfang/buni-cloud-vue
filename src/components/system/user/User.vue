@@ -56,7 +56,7 @@
     />
 
     <!-- 新增/编辑对话框 -->
-    <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="40%" @closed="resetForm">
+    <el-dialog v-model="showAddDialog" :title="addMode ? '新增用户' : '编辑用户'" width="35%" @closed="resetForm">
       <el-form ref="addFormRef" :model="userForm" :rules="formRules" label-width="100px">
         <el-row :gutter="20">
           <el-col :span="11">
