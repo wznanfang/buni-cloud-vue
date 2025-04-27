@@ -70,7 +70,7 @@ function formatErrorMessage(data) {
 // 根据请求方法生成操作名称（可选）
 function getActionName(method, url) {
     const actionMap = {
-        post: '新增',
+        post: '操作',
         put: '编辑',
         patch: '更新',
         delete: '删除'
