@@ -319,24 +319,23 @@ onMounted(() => {
 <style scoped>
 
 .breadcrumb {
-  margin: 30px 0 20px 20px;
   font-size: 16px;
 }
 
 .flex {
   display: flex;
-  margin: 30px 0 20px 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   align-items: center;
 }
 
 .searchInput {
-  width: 200px;
-  margin-right: 20px;
+  width: 240px;
+  height: 40px;
 }
 
 .userTable {
-  width: 98%;
-  margin-left: 20px;
+  width: 100%;
 }
 
 .button-container {
