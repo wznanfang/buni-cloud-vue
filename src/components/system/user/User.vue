@@ -20,10 +20,10 @@
       <el-table-column prop="username" label="用户名" fixed/>
       <el-table-column prop="name" label="姓名"/>
       <el-table-column prop="age" label="年龄"/>
-      <el-table-column prop="sex" label="性别" :formatter="(row) => ['女', '男'][row.sex]"/>
-      <el-table-column prop="tel" label="电话"/>
+      <el-table-column prop="gender" label="性别" :formatter="(row) => ['女', '男'][row.gender]"/>
+      <el-table-column prop="phone" label="电话"/>
       <el-table-column prop="enable" label="状态" :formatter="(row) => ['禁用', '启用'][row.enable]"/>
-      <el-table-column prop="admin" label="管理员"/>
+      <el-table-column prop="admin" label="管理员" :formatter="(row) => ['是', '否'][row.enable]"/>
       <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip/>
       <el-table-column label="操作" fixed="right" width="100px">
         <template v-slot="scope">
@@ -80,16 +80,16 @@
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="性别" prop="sex">
-              <el-select v-model="userForm.sex" placeholder="请选择性别">
+            <el-form-item label="性别" prop="gender">
+              <el-select v-model="userForm.gender" placeholder="请选择性别">
                 <el-option label="男" :value="1"/>
                 <el-option label="女" :value="0"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="11">
-            <el-form-item label="电话" prop="tel">
-              <el-input v-model="userForm.tel" clearable/>
+            <el-form-item label="电话" prop="phone">
+              <el-input v-model="userForm.phone" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="11">
@@ -147,8 +147,8 @@ const userForm = ref({
   password: "",
   name: "",
   age: null,
-  sex: 1,
-  tel: "",
+  gender: 1,
+  phone: "",
   enable: 0,
 });
 
@@ -156,7 +156,7 @@ const formRules = reactive({
   username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
   name: [{required: true, message: '名字不能为空', trigger: 'blur'}],
   password: [{required: true, message: '密码不能为空', trigger: 'blur'}],
-  tel: [{required: true, message: '电话不能为空', trigger: 'blur'}],
+  phone: [{required: true, message: '电话不能为空', trigger: 'blur'}],
   enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
 })
 
@@ -299,8 +299,8 @@ function resetForm() {
     password: "",
     name: "",
     age: null,
-    sex: 1,
-    tel: "",
+    gender: 1,
+    phone: "",
     enable: 0,
   };
   nextTick(() => {
