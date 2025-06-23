@@ -208,7 +208,6 @@ async function updatePassword() {
 
 .user-card {
   position: relative;
-  margin: 20px 20px;
 }
 
 .avatar-icon {
