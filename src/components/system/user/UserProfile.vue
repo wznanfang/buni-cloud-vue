@@ -34,16 +34,16 @@
         </el-row>
         <el-row gutter="20">
           <el-col :span="8">
-            <el-form-item label="性别" prop="sex">
-              <el-select v-model="mySelfInfo.sex" placeholder="请选择性别">
+            <el-form-item label="性别" prop="gender">
+              <el-select v-model="mySelfInfo.gender" placeholder="请选择性别">
                 <el-option label="男" :value="1" />
                 <el-option label="女" :value="0" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="电话" prop="tel">
-              <el-input v-model="mySelfInfo.tel" clearable/>
+            <el-form-item label="电话" prop="phone">
+              <el-input v-model="mySelfInfo.phone" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -112,8 +112,8 @@ const mySelfInfo = ref({
   password: "",
   name: "",
   age: null,
-  sex: 1,
-  tel: "",
+  gender: 1,
+  phone: "",
   enable: 0,
 });
 
@@ -121,8 +121,8 @@ const formRules = reactive({
   username: [{required: true, message: '用户名不能为空', trigger: 'blur'}],
   name: [{required: true, message: '名字不能为空', trigger: 'blur'}],
   age: [{required: true, message: '年龄不能为空', trigger: 'blur'}],
-  sex: [{required: true, message: '性别不能为空', trigger: 'blur'}],
-  tel: [{required: true, message: '电话不能为空', trigger: 'blur'}],
+  gender: [{required: true, message: '性别不能为空', trigger: 'blur'}],
+  phone: [{required: true, message: '电话不能为空', trigger: 'blur'}],
   enable: [{required: true, message: '状态不能为空', trigger: 'blur'}],
 })
 

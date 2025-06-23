@@ -52,7 +52,7 @@
           </el-col>
           <el-col :span="11">
             <el-form-item label="接口地址" prop="url">
-              <el-input v-model="authorityForm.url" clearable />
+              <el-input type="textarea" v-model="authorityForm.url" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="11">
